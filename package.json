@@ -1,0 +1,27 @@
+{
+  "name": "despensa",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/shared/app.ts",
+    "db:generate": "pnpm drizzle-kit generate --name",
+    "db:migrate": "pnpm drizzle-kit migrate",
+    "db:studio": "pnpm drizzle-kit studio",
+    "build": "tsup src"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.8",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.39.3",
+    "hono": "^4.7.2",
+    "pg": "^8.13.3",
+    "tsup": "^8.3.6",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@types/pg": "^8.11.11",
+    "drizzle-kit": "^0.30.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,18 @@
+# dev
+.vscode/*
+!.vscode/launch.json
+!.vscode/*.code-snippets
+
+# deps
+node_modules/
+
+# env
+.env
+
+
+# logs
+logs/
+*.log
+pnpm-debug.log*
+
+
