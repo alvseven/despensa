@@ -1,5 +1,5 @@
-import { relations, type InferSelectModel } from "drizzle-orm";
-import { pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import type { InferSelectModel } from "drizzle-orm";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { randomUUID } from "crypto";
 
