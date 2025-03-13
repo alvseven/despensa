@@ -20,7 +20,7 @@ services:
       - "3333:3333"
     env_file:
       - ./.env
-    command: ["sh","-c", "pnpm db:migrate && pnpm dev"]
+    command: ["sh","-c", "pnpm dev"]
     depends_on:
       database:
         condition: service_healthy

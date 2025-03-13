@@ -8,6 +8,13 @@
       "when": 1740097405831,
       "tag": "20250221002325_create_table_users_and_products",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1741903740037,
+      "tag": "20250313220900_create-users-and-products-relations",
+      "breakpoints": true
     }
   ]
 }

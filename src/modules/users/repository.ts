@@ -7,7 +7,12 @@ export const usersRepository = () => {
   const createUser = async (
     user: Pick<User, "email" | "password" | "name" | "avatarUrl">
   ) => {
-    const [userCreated] = await db.insert(users).values(user).returning();
+    const [userCreated] = await db.insert(users).values(user).returning({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      avatarUrl: users.avatarUrl,
+    });
 
     return userCreated;
   };

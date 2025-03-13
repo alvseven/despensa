@@ -10,6 +10,7 @@ const envsSchema = z.object({
   POSTGRES_PASSWORD: z.string(),
   POSTGRES_DB: z.string(),
   DATABASE_URL: z.string(),
+  DRIZZLE_KIT_DATABASE_URL: z.string(),
 });
 
 export const envs = envsSchema.parse(process.env);

@@ -13,7 +13,10 @@ export const createUserRequestSchema = z
       email: z.string().email(),
       avatarUrl: z.string().url(),
       password: z
-        .string()
+        .string({
+          required_error: "The field 'password' is required",
+          invalid_type_error: "The field 'password' should be a string",
+        })
         .min(8, {
           message:
             "The password is required and must be at least 8 characters long.",
@@ -60,7 +63,10 @@ export const updateUserByIdRequestSchema = z.object({
   email: z.string().email().optional(),
   avatarUrl: z.string().url().optional(),
   password: z
-    .string()
+    .string({
+      required_error: "The field 'password' is required",
+      invalid_type_error: "The field 'password' should be a string",
+    })
     .min(8, {
       message:
         "The password is required and must be at least 8 characters long.",
@@ -82,3 +88,27 @@ export const deleteUserByIdRequestSchema = z.object({
 });
 
 export type DeleteUserByIdInput = z.infer<typeof deleteUserByIdRequestSchema>;
+
+export const authenticateUserRequestSchema = z.object({
+  email: z.string().email(),
+  password: z
+    .string({
+      required_error: "The field 'password' is required",
+      invalid_type_error: "The field 'password' should be a string",
+    })
+    .min(8, {
+      message:
+        "The password is required and must be at least 8 characters long.",
+    })
+    .regex(oneUpperCaseLetterRegex, "At least one uppercase letter is required")
+    .regex(oneLowerCaseLetterRegex, "At least one lowercase letter is required")
+    .regex(oneNumberRegex, "At least one number is required")
+    .regex(
+      oneSpecialCharacterRegex,
+      "At least one special character is required"
+    ),
+});
+
+export type AuthenticateUserInput = z.infer<
+  typeof authenticateUserRequestSchema
+>;

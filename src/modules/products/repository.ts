@@ -8,7 +8,10 @@ import {
 
 export const productsRepository = () => {
   const createProduct = async (
-    product: Pick<Product, "name" | "buyedAt" | "category" | "expiresAt">
+    product: Pick<
+      Product,
+      "userId" | "name" | "buyedAt" | "category" | "expiresAt"
+    >
   ) => {
     const [productCreated] = await db
       .insert(products)
@@ -30,7 +33,9 @@ export const productsRepository = () => {
   const updateProductById = async ({
     id,
     ...product
-  }: Partial<Pick<Product, "name" | "buyedAt" | "category" | "expiresAt">> &
+  }: Partial<
+    Pick<Product, "userId" | "name" | "buyedAt" | "category" | "expiresAt">
+  > &
     Pick<Product, "id">) => {
     const [productUpdated] = await db
       .update(products)

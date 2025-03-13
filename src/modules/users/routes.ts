@@ -2,10 +2,9 @@ import { Hono } from "hono";
 
 import {
   createUserRequestSchema,
-  deleteUserByIdRequestSchema,
   getUserByIdRequestSchema,
   updateUserByIdRequestSchema,
-  userIdSchema,
+  authenticateUserRequestSchema,
 } from "./schemas.ts";
 
 import { usersService } from "./services.ts";
@@ -14,8 +13,13 @@ import { validateSchema } from "../../shared/helpers/validate-schema.ts";
 
 export const usersRoutes = new Hono();
 
-const { createUser, getUserById, updateUserById, deleteUserById } =
-  usersService(usersRepository());
+const {
+  createUser,
+  getUserById,
+  updateUserById,
+  deleteUserById,
+  authenticateUser,
+} = usersService(usersRepository());
 
 usersRoutes.post("", async (c) => {
   const body = await c.req.json();
@@ -95,4 +99,26 @@ usersRoutes.delete("/:id", async (c) => {
   }
 
   return c.status(204);
+});
+
+usersRoutes.post("/login", async (c) => {
+  const body = await c.req.json();
+
+  const [schemaError, parsedSchema] = validateSchema(
+    authenticateUserRequestSchema,
+    body,
+    ["password"]
+  );
+
+  if (schemaError) {
+    return c.json({ message: schemaError.message }, schemaError.code);
+  }
+
+  const [error, response] = await authenticateUser(parsedSchema.data);
+
+  if (error) {
+    return c.json({ message: error.message }, error.code);
+  }
+
+  return c.json(response.data, response.code);
 });

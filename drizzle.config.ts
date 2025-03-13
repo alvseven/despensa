@@ -6,7 +6,7 @@ export default defineConfig({
   schema: ["./src/shared/database/schemas/index.ts"],
   dialect: "postgresql",
   dbCredentials: {
-    url: envs.DATABASE_URL,
+    url: envs.DRIZZLE_KIT_DATABASE_URL,
   },
   migrations: {
     prefix: "timestamp",
