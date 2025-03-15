@@ -81,15 +81,21 @@ export function usersService(usersRepository: UsersRepository) {
   async function authenticateUser({ password, email }: AuthenticateUserInput) {
     const userFound = await usersRepository.getUserByEmail(email);
 
-    const passwordsMatch = await bcrypt.compare(password, userFound.password);
-
-    if (!userFound || !passwordsMatch) {
+    if (!userFound) {
       return errorResponse("Invalid credentials", 401);
     }
 
+    const passwordsMatch = await bcrypt.compare(password, userFound.password);
+
+    if (!passwordsMatch) {
+      return errorResponse("Invalid credentials", 401);
+    }
+
+    const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+
     const payload = {
       sub: { email: userFound.email, id: userFound.id },
-      exp: envs.JWT_EXPIRATION,
+      exp: currentTimeInSeconds + envs.JWT_EXPIRATION,
     };
 
     const token = await sign(payload, envs.JWT_SECRET);

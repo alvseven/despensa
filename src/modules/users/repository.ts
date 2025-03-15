@@ -18,7 +18,15 @@ export const usersRepository = () => {
   };
 
   const getUserById = async (id: User["id"]) => {
-    const [userFound] = await db.select().from(users).where(eq(users.id, id));
+    const [userFound] = await db.query.users.findMany({
+      with: {
+        products: true,
+      },
+      columns: {
+        password: false,
+      },
+      where: eq(users.id, id),
+    });
 
     return userFound;
   };

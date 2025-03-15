@@ -10,6 +10,8 @@ import {
 import { usersService } from "./services.ts";
 import { usersRepository } from "./repository.ts";
 import { validateSchema } from "../../shared/helpers/validate-schema.ts";
+import { validateUserOwnership } from "../../shared/middlewares/validate-user-ownership.ts";
+import { verifyJwt } from "../../shared/middlewares/verify-jwt.ts";
 
 export const usersRoutes = new Hono();
 
@@ -43,7 +45,7 @@ usersRoutes.post("", async (c) => {
   return c.json(response.data, response.code);
 });
 
-usersRoutes.get("/:id", async (c) => {
+usersRoutes.get("/:id", verifyJwt, validateUserOwnership, async (c) => {
   const [schemaError, parsedSchema] = validateSchema(getUserByIdRequestSchema, {
     id: c.req.param("id"),
   });
@@ -61,7 +63,7 @@ usersRoutes.get("/:id", async (c) => {
   return c.json(response.data, response.code);
 });
 
-usersRoutes.patch("/:id", async (c) => {
+usersRoutes.patch("/:id", verifyJwt, validateUserOwnership, async (c) => {
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(
@@ -83,7 +85,7 @@ usersRoutes.patch("/:id", async (c) => {
   return c.json(response.data, response.code);
 });
 
-usersRoutes.delete("/:id", async (c) => {
+usersRoutes.delete("/:id", verifyJwt, validateUserOwnership, async (c) => {
   const [schemaError, parsedSchema] = validateSchema(getUserByIdRequestSchema, {
     id: c.req.param("id"),
   });
