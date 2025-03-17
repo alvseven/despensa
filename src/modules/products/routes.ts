@@ -2,6 +2,7 @@ import { Hono } from "hono";
 
 import {
   createProductRequestSchema,
+  deleteProductByIdRequestSchema,
   getProductByIdRequestSchema,
   updateProductByIdRequestSchema,
 } from "./schemas.ts";
@@ -9,18 +10,20 @@ import {
 import { productsService } from "./services.ts";
 import { productsRepository } from "./repository.ts";
 import { validateSchema } from "../../shared/helpers/validate-schema.ts";
+import { verifyJwt } from "../../shared/middlewares/verify-jwt.ts";
 
 export const productsRoutes = new Hono();
 
 const { createProduct, getProductById, updateProductById, deleteProductById } =
   productsService(productsRepository());
 
-productsRoutes.post("", async (c) => {
+productsRoutes.post("", verifyJwt, async (c) => {
+  const userId = c.get("jwtPayload").sub.id;
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(
     createProductRequestSchema,
-    body
+    { ...body, userId }
   );
 
   if (schemaError) {
@@ -32,11 +35,15 @@ productsRoutes.post("", async (c) => {
   return c.json(response.data, response.code);
 });
 
-productsRoutes.get("/:id", async (c) => {
+productsRoutes.get("/:id", verifyJwt, async (c) => {
+  const userId = c.get("jwtPayload").sub.id;
+  const id = c.req.param("id");
+
   const [schemaError, parsedSchema] = validateSchema(
     getProductByIdRequestSchema,
     {
-      id: c.req.param("id"),
+      userId,
+      id,
     }
   );
 
@@ -53,12 +60,14 @@ productsRoutes.get("/:id", async (c) => {
   return c.json(response.data, response.code);
 });
 
-productsRoutes.patch("/:id", async (c) => {
+productsRoutes.patch("/:id", verifyJwt, async (c) => {
+  const userId = c.get("jwtPayload").sub.id;
+  const id = c.req.param("id");
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(
     updateProductByIdRequestSchema,
-    { ...body, id: c.req.param("id") }
+    { ...body, id, userId }
   );
 
   if (schemaError) {
@@ -74,11 +83,15 @@ productsRoutes.patch("/:id", async (c) => {
   return c.json(response.data, response.code);
 });
 
-productsRoutes.delete("/:id", async (c) => {
+productsRoutes.delete("/:id", verifyJwt, async (c) => {
+  const userId = c.get("jwtPayload").sub.id;
+  const id = c.req.param("id");
+
   const [schemaError, parsedSchema] = validateSchema(
-    getProductByIdRequestSchema,
+    deleteProductByIdRequestSchema,
     {
-      id: c.req.param("id"),
+      id,
+      userId,
     }
   );
 

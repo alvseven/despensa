@@ -41,8 +41,6 @@ export function usersService(usersRepository: UsersRepository) {
   async function getUserById({ id }: GetUserByIdInput) {
     const userFound = await usersRepository.getUserById(id);
 
-    // TODO: REMEMBER TO HANDLE IDOR MA FREND
-
     if (!userFound) {
       return errorResponse("User not found", 404);
     }
@@ -52,8 +50,6 @@ export function usersService(usersRepository: UsersRepository) {
 
   async function updateUserById(user: UpdateUserByIdInput) {
     const userFound = await usersRepository.getUserById(user.id);
-
-    // TODO: REMEMBER TO HANDLE IDOR MA FREND
 
     if (!userFound) {
       return errorResponse("User not found", 404);
@@ -66,8 +62,6 @@ export function usersService(usersRepository: UsersRepository) {
 
   async function deleteUserById({ id }: DeleteUserByIdInput) {
     const userFound = await usersRepository.getUserById(id);
-
-    // TODO: REMEMBER TO HANDLE IDOR MA FREND
 
     if (!userFound) {
       return errorResponse("User not found", 404);
@@ -91,7 +85,7 @@ export function usersService(usersRepository: UsersRepository) {
       return errorResponse("Invalid credentials", 401);
     }
 
-    const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+    const currentTimeInSeconds = Math.floor(Date.now() / 100);
 
     const payload = {
       sub: { email: userFound.email, id: userFound.id },

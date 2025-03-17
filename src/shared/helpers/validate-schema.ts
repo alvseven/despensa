@@ -4,7 +4,7 @@ import { zodCustomErrorMap } from "../dtos/zod-custom-error-map.ts";
 
 export const validateSchema = <Schema extends ZodSchema>(
   schema: Schema,
-  data: unknown,
+  data: Record<keyof z.infer<Schema>, unknown>,
   fields: Array<keyof z.infer<Schema>> = []
 ):
   | [null, { data: z.infer<Schema> }]

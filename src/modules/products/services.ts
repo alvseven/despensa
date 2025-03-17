@@ -19,10 +19,11 @@ export function productsService(productsRepository: ProductsRepository) {
     return successResponse(createdProduct, 201);
   }
 
-  async function getProductById({ id }: GetProductByIdInput) {
-    const productFound = await productsRepository.getProductById(id);
-
-    // TODO: REMEMBER TO HANDLE IDOR MA FREND
+  async function getProductById({ id, userId }: GetProductByIdInput) {
+    const productFound = await productsRepository.getProductByIdAndUserId({
+      id,
+      userId,
+    });
 
     if (!productFound) {
       return errorResponse("Product not found", 404);
@@ -32,10 +33,10 @@ export function productsService(productsRepository: ProductsRepository) {
   }
 
   async function updateProductById(product: UpdateProductByIdInput) {
-    const productFound = await productsRepository.getProductById(product.id);
-
-    // TODO: REMEMBER TO HANDLE IDOR MA FREND
-
+    const productFound = await productsRepository.getProductByIdAndUserId({
+      id: product.id,
+      userId: product.userId,
+    });
     if (!productFound) {
       return errorResponse("Product not found", 404);
     }
@@ -45,16 +46,17 @@ export function productsService(productsRepository: ProductsRepository) {
     return successResponse(updatedProduct, 200);
   }
 
-  async function deleteProductById({ id }: DeleteProductByIdInput) {
-    const productFound = await productsRepository.getProductById(id);
-
-    // TODO: REMEMBER TO HANDLE IDOR MA FREND
+  async function deleteProductById({ id, userId }: DeleteProductByIdInput) {
+    const productFound = await productsRepository.getProductByIdAndUserId({
+      id,
+      userId,
+    });
 
     if (!productFound) {
       return errorResponse("Product not found", 404);
     }
 
-    await productsRepository.deleteProductById(id);
+    await productsRepository.deleteProductById({ id, userId });
 
     return successResponse(true, 200); //  not used, and should be a 204;
   }

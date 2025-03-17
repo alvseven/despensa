@@ -1,16 +1,17 @@
 import { z } from "zod";
-import { zodCustomErrorMap } from "../../shared/dtos/zod-custom-error-map.ts";
 
 export const createProductRequestSchema = z.object({
+  userId: z.string().uuid(),
   name: z.string().min(1),
-  buyedAt: z.string(),
+  buyedAt: z.string(), // TODO - add date validation (it can be in the future) format: YYYY-MM-DD
   category: z.string(),
-  expiresAt: z.string(),
+  expiresAt: z.string(), // TODO - add date validation (it can be in the past) format: YYYY-MM-DD
 });
 
 export type CreateProductInput = z.infer<typeof createProductRequestSchema>;
 
 export const getProductByIdRequestSchema = z.object({
+  userId: z.string().uuid(),
   id: z.string().uuid(),
 });
 
@@ -18,10 +19,11 @@ export type GetProductByIdInput = z.infer<typeof getProductByIdRequestSchema>;
 
 export const updateProductByIdRequestSchema = z.object({
   id: z.string().uuid(),
+  userId: z.string().uuid(),
   name: z.string().min(1).optional(),
-  buyedAt: z.string().optional(),
-  category: z.string().optional(),
-  expiresAt: z.string().optional(),
+  buyedAt: z.string(), // TODO - add date validation (it can be in the future) format: YYYY-MM-DD
+  category: z.string(),
+  expiresAt: z.string(), // TODO - add date validation (it can be in the past) format: YYYY-MM-DD
 });
 
 export type UpdateProductByIdInput = z.infer<
@@ -29,6 +31,7 @@ export type UpdateProductByIdInput = z.infer<
 >;
 
 export const deleteProductByIdRequestSchema = z.object({
+  userId: z.string().uuid(),
   id: z.string().uuid(),
 });
 

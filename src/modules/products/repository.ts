@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { db } from "../../shared/database/index.ts";
 import {
@@ -16,43 +16,54 @@ export const productsRepository = () => {
     const [productCreated] = await db
       .insert(products)
       .values(product)
-      .returning();
+      .returning()
+      .execute();
 
     return productCreated;
   };
 
-  const getProductById = async (id: Product["id"]) => {
+  const getProductByIdAndUserId = async ({
+    id,
+    userId,
+  }: Pick<Product, "id" | "userId">) => {
     const [productFound] = await db
       .select()
       .from(products)
-      .where(eq(products.id, id));
+      .where(and(eq(products.id, id), eq(products.userId, userId)))
+      .execute();
 
     return productFound;
   };
 
   const updateProductById = async ({
     id,
+    userId,
     ...product
-  }: Partial<
-    Pick<Product, "userId" | "name" | "buyedAt" | "category" | "expiresAt">
-  > &
-    Pick<Product, "id">) => {
+  }: Partial<Pick<Product, "name" | "buyedAt" | "category" | "expiresAt">> &
+    Pick<Product, "id" | "userId">) => {
     const [productUpdated] = await db
       .update(products)
       .set(product)
-      .where(eq(products.id, id))
-      .returning();
+      .where(and(eq(products.id, id), eq(products.userId, userId)))
+      .returning()
+      .execute();
 
     return productUpdated;
   };
 
-  const deleteProductById = async (id: Product["id"]) => {
-    return db.delete(products).where(eq(products.id, id));
+  const deleteProductById = async ({
+    id,
+    userId,
+  }: Pick<Product, "id" | "userId">) => {
+    return db
+      .delete(products)
+      .where(and(eq(products.id, id), eq(products.userId, userId)))
+      .execute();
   };
 
   return {
     createProduct,
-    getProductById,
+    getProductByIdAndUserId,
     updateProductById,
     deleteProductById,
   };
