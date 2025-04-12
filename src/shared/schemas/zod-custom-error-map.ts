@@ -50,10 +50,10 @@ const handleTooSmallError = (error: z.ZodTooSmallIssue, ctx: Ctx, field: Field) 
   return { message: ctx.defaultError };
 };
 
-    const handleTooBigError = (error: z.ZodTooBigIssue, ctx: Ctx, field: Field) => {
-  const {         type, maximum } = error;
+const handleTooBigError = (error: z.ZodTooBigIssue, ctx: Ctx, field: Field) => {
+  const { type, maximum } = error;
 
-  switch    ( type) {
+  switch (type) {
     case 'string':
       if (error.exact) {
         return {
