@@ -1,6 +1,7 @@
 {
   "name": "despensa",
   "type": "module",
+  "packageManager": "pnpm@10.7.0",
   "scripts": {
     "dev": "tsx watch src/shared/app.ts",
     "db:generate": "pnpm drizzle-kit generate --name",
