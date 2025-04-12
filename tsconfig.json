@@ -6,12 +6,10 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "noEmit" : true,
-    "types": [
-      "node"
-    ],
+    "noEmit": true,
+    "types": ["node"],
     "noErrorTruncation": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
+    "jsxImportSource": "hono/jsx"
   }
 }

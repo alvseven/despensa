@@ -1,41 +1,36 @@
-import { eq } from "drizzle-orm";
+import { eq } from 'drizzle-orm';
 
-import { db } from "../../shared/database/index.ts";
-import { users, type User } from "../../shared/database/schemas/users.ts";
+import { db } from '../../shared/database/index.ts';
+import { type User, users } from '../../shared/database/schemas/users.ts';
 
 export const usersRepository = () => {
-  const createUser = async (
-    user: Pick<User, "email" | "password" | "name" | "avatarUrl">
-  ) => {
+  const createUser = async (user: Pick<User, 'email' | 'password' | 'name' | 'avatarUrl'>) => {
     const [userCreated] = await db.insert(users).values(user).returning({
       id: users.id,
       name: users.name,
       email: users.email,
-      avatarUrl: users.avatarUrl,
+      avatarUrl: users.avatarUrl
     });
 
     return userCreated;
   };
 
-  const getUserById = async (id: User["id"]) => {
+  const getUserById = async (id: User['id']) => {
     const [userFound] = await db.query.users.findMany({
       with: {
-        products: true,
+        products: true
       },
       columns: {
-        password: false,
+        password: false
       },
-      where: eq(users.id, id),
+      where: eq(users.id, id)
     });
 
     return userFound;
   };
 
-  const getUserByEmail = async (email: User["email"]) => {
-    const [userFound] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email));
+  const getUserByEmail = async (email: User['email']) => {
+    const [userFound] = await db.select().from(users).where(eq(users.email, email));
 
     return userFound;
   };
@@ -43,19 +38,14 @@ export const usersRepository = () => {
   const updateUserById = async ({
     id,
     ...user
-  }: Partial<Pick<User, "email" | "password" | "name" | "avatarUrl">> &
-    Pick<User, "id">) => {
-    const [userUpdated] = await db
-      .update(users)
-      .set(user)
-      .where(eq(users.id, id))
-      .returning();
+  }: Partial<Pick<User, 'email' | 'password' | 'name' | 'avatarUrl'>> & Pick<User, 'id'>) => {
+    const [userUpdated] = await db.update(users).set(user).where(eq(users.id, id)).returning();
 
     return userUpdated;
   };
 
-  const deleteUserById = async (id: User["id"]) => {
-    return db.delete(users).where(eq(users.id, id));
+  const softDeleteUserById = async (id: User['id']) => {
+    return db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, id)).returning();
   };
 
   return {
@@ -63,8 +53,6 @@ export const usersRepository = () => {
     getUserById,
     getUserByEmail,
     updateUserById,
-    deleteUserById,
+    softDeleteUserById
   };
 };
-
-export type UsersRepository = ReturnType<typeof usersRepository>;
