@@ -1,16 +1,13 @@
 name: Lint
 
 on:
-  workflow_run:
-    workflows: ["Types"]
-    types: 
-      - completed
+  workflow_call:
+    
 env:
   NODE_VERSION: 22
 
 jobs:
   linting:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Linting
     runs-on: ubuntu-latest
     steps:
