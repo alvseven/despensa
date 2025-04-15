@@ -26,5 +26,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Code Linting
+      - name: Type Checking
         run: pnpm types:ci
