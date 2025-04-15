@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { authenticateUserRequestSchema } from './authenticate/schemas.ts';
 import { authenticateUser } from './authenticate/use-case.ts';
 
-import { validateSchema } from '../../shared/helpers/validate-schema.ts';
+import { validateSchema } from '@/shared/helpers/validate-schema.ts';
 
 export const authRoutes = new Hono();
 

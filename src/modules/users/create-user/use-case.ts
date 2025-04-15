@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs';
 
-import { usersRepository } from '../repository.ts';
 import type { CreateUserInput } from './schemas.ts';
 
-import { envs } from '../../../shared/config/env.ts';
-import { errorResponse, successResponse } from '../../../shared/infra/http/api-response.ts';
-import { STATUS_CODES } from '../../../shared/infra/http/status-code.ts';
+import { envs } from '@/shared/config/env.ts';
+import { usersRepository } from '@/shared/database/repositories/users.ts';
+import { errorResponse, successResponse } from '@/shared/infra/http/api-response.ts';
+import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
 
 export async function createUser(user: CreateUserInput) {
   const { getUserByEmail, createUser } = usersRepository();

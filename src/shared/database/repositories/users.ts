@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 
-import { db } from '../../shared/database/index.ts';
-import { type User, users } from '../../shared/database/schemas/users.ts';
+import { db } from '../index.ts';
+import { type User, users } from '../schemas/users.ts';
 
 export const usersRepository = () => {
   const createUser = async (user: Pick<User, 'email' | 'password' | 'name' | 'avatarUrl'>) => {

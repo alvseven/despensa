@@ -1,7 +1,7 @@
 import type { ZodSchema, z } from 'zod';
 
-import { type ErrorStatusCode, STATUS_CODES } from '../infra/http/status-code.ts';
-import { zodCustomErrorMap } from '../schemas/zod-custom-error-map.ts';
+import { zodCustomErrorMap } from '@/shared/config/zod-custom-error-map.ts';
+import { type ErrorStatusCode, STATUS_CODES } from '@/shared/infra/http/status-code.ts';
 
 export const validateSchema = <Schema extends ZodSchema>(
   schema: Schema,

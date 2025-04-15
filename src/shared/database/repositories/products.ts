@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 
-import { db } from '../../shared/database/index.ts';
-import { type Product, products } from '../../shared/database/schemas/products.ts';
+import { db } from '../index.ts';
+import { type Product, products } from '../schemas/products.ts';
 
 export const productsRepository = () => {
   const createProduct = async (
@@ -23,7 +23,9 @@ export const productsRepository = () => {
   };
 
   const getProductsByUserId = async ({ userId }: Pick<Product, 'userId'>) => {
-    return await db.select().from(products).where(eq(products.userId, userId)).execute();
+    const [product] = await db.select().from(products).where(eq(products.userId, userId)).execute();
+
+    return product;
   };
 
   const updateProductById = async ({

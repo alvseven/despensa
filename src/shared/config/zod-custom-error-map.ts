@@ -1,4 +1,4 @@
-import { type ZodErrorMap, type ZodSchema, ZodType, z } from 'zod';
+import { type ZodErrorMap, type ZodSchema, z } from 'zod';
 
 type Error = Parameters<ZodErrorMap>['0'];
 type Ctx = Parameters<ZodErrorMap>['1'];

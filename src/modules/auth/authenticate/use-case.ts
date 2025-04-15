@@ -1,15 +1,15 @@
 import bcrypt from 'bcryptjs';
 import { sign } from 'hono/jwt';
 
-import { authRepository } from '../repository.ts';
+import { usersRepository } from '@/shared/database/repositories/users.ts';
 import type { AuthenticateUserInput } from './schemas.ts';
 
-import { envs } from '../../../shared/config/env.ts';
-import { errorResponse, successResponse } from '../../../shared/infra/http/api-response.ts';
-import { STATUS_CODES } from '../../../shared/infra/http/status-code.ts';
+import { envs } from '@/shared/config/env.ts';
+import { errorResponse, successResponse } from '@/shared/infra/http/api-response.ts';
+import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
 
 export async function authenticateUser({ password, email }: AuthenticateUserInput) {
-  const { getUserByEmail } = authRepository();
+  const { getUserByEmail } = usersRepository();
 
   const userFound = await getUserByEmail(email);
 
