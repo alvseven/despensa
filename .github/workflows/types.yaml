@@ -1,9 +1,7 @@
 name: Types
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_call:
 
 env:
   NODE_VERSION: 22
@@ -28,5 +26,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Code Linting
+      - name: Type Checking
         run: pnpm types:ci

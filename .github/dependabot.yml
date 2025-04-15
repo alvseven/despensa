@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      aws-sdk:
+        patterns:
+          - "@aws-sdk/*"
+      dev-dependencies:
+        patterns:
+          - "@types/*"
+          - "@biomejs/*"
+    allow:
+      - dependency-type: "direct"
+    labels:
+      - "dependencies"
+    reviewers:
+      - "alvseven"
+    versioning-strategy: increase
+    open-pull-requests-limit: 5
