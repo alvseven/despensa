@@ -4,12 +4,15 @@ import { db } from '../index.ts';
 import { type User, users } from '../schemas/users.ts';
 
 export const usersRepository = () => {
-  const createUser = async (user: Pick<User, 'email' | 'password' | 'name' | 'avatarUrl'>) => {
+  const createUser = async (
+    user: Pick<User, 'email' | 'password' | 'name' | 'avatarUrl' | 'phoneNumber'>
+  ) => {
     const [userCreated] = await db.insert(users).values(user).returning({
       id: users.id,
       name: users.name,
       email: users.email,
-      avatarUrl: users.avatarUrl
+      avatarUrl: users.avatarUrl,
+      phoneNumber: users.phoneNumber
     });
 
     return userCreated;
@@ -35,6 +38,12 @@ export const usersRepository = () => {
     return userFound;
   };
 
+  const getUserByPhoneNumber = async (phoneNumber: User['phoneNumber']) => {
+    const [userFound] = await db.select().from(users).where(eq(users.phoneNumber, phoneNumber));
+
+    return userFound;
+  };
+
   const updateUserById = async ({
     id,
     ...user
@@ -48,11 +57,22 @@ export const usersRepository = () => {
     return db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, id)).returning();
   };
 
+  const setUserEmailVerified = async (id: User['id']) => {
+    return db.update(users).set({ isEmailVerified: true }).where(eq(users.id, id)).returning();
+  };
+
+  const setUserPhoneVerified = async (id: User['id']) => {
+    return db.update(users).set({ isPhoneVerified: true }).where(eq(users.id, id)).returning();
+  };
+
   return {
     createUser,
     getUserById,
     getUserByEmail,
+    getUserByPhoneNumber,
     updateUserById,
-    softDeleteUserById
+    softDeleteUserById,
+    setUserEmailVerified,
+    setUserPhoneVerified
   };
 };
