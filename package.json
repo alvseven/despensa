@@ -1,12 +1,17 @@
 {
   "name": "despensa",
   "type": "module",
+  "packageManager": "pnpm@10.7.0",
   "scripts": {
+    "build": "tsup src",
     "dev": "tsx watch src/shared/app.ts",
     "db:generate": "pnpm drizzle-kit generate --name",
     "db:migrate": "pnpm drizzle-kit migrate",
     "db:studio": "pnpm drizzle-kit studio",
-    "build": "tsup src"
+    "lint": "biome check .",
+    "lint:ci": "biome ci .",
+    "lint:fix": "biome check --write --unsafe .",
+    "types:ci": "tsc --noEmit"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.8",
@@ -19,6 +24,8 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@arthurfiorette/biomejs-config": "^1.0.7",
+    "@biomejs/biome": "^1.9.4",
     "@types/node": "^20.11.17",
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.4",

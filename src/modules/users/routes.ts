@@ -1,36 +1,25 @@
-import { Hono } from "hono";
+import { Hono } from 'hono';
 
-import {
-  createUserRequestSchema,
-  getUserByIdRequestSchema,
-  updateUserByIdRequestSchema,
-  authenticateUserRequestSchema,
-} from "./schemas.ts";
+import { createUserRequestSchema } from './create-user/schemas.ts';
+import { createUser } from './create-user/use-case.ts';
+import { getUserByIdRequestSchema } from './get-user/schemas.ts';
+import { getUserById } from './get-user/use-case.ts';
+import { softDeleteUserByIdRequestSchema } from './soft-delete-user/schemas.ts';
+import { softDeleteUserById } from './soft-delete-user/use-case.ts';
+import { updateUserByIdRequestSchema } from './update-user/schemas.ts';
+import { updateUserById } from './update-user/use-case.ts';
 
-import { usersService } from "./services.ts";
-import { usersRepository } from "./repository.ts";
-import { validateSchema } from "../../shared/helpers/validate-schema.ts";
-import { validateUserOwnership } from "../../shared/middlewares/validate-user-ownership.ts";
-import { verifyJwt } from "../../shared/middlewares/verify-jwt.ts";
+import { verifyJwt } from '../auth/middlewares/verify-token.ts';
+
+import { validateSchema } from '../../shared/helpers/validate-schema.ts';
+import { validateUserOwnership } from '../../shared/infra/http/middlewares/validate-user-ownership.ts';
 
 export const usersRoutes = new Hono();
 
-const {
-  createUser,
-  getUserById,
-  updateUserById,
-  deleteUserById,
-  authenticateUser,
-} = usersService(usersRepository());
-
-usersRoutes.post("", async (c) => {
+usersRoutes.post('', async (c) => {
   const body = await c.req.json();
 
-  const [schemaError, parsedSchema] = validateSchema(
-    createUserRequestSchema,
-    body,
-    ["password"]
-  );
+  const [schemaError, parsedSchema] = validateSchema(createUserRequestSchema, body, ['password']);
 
   if (schemaError) {
     return c.json({ message: schemaError.message }, schemaError.code);
@@ -45,9 +34,9 @@ usersRoutes.post("", async (c) => {
   return c.json(response.data, response.code);
 });
 
-usersRoutes.get("/:id", verifyJwt, validateUserOwnership, async (c) => {
+usersRoutes.get('/:id', verifyJwt, validateUserOwnership, async (c) => {
   const [schemaError, parsedSchema] = validateSchema(getUserByIdRequestSchema, {
-    id: c.req.param("id"),
+    id: c.req.param('id')
   });
 
   if (schemaError) {
@@ -63,13 +52,13 @@ usersRoutes.get("/:id", verifyJwt, validateUserOwnership, async (c) => {
   return c.json(response.data, response.code);
 });
 
-usersRoutes.patch("/:id", verifyJwt, validateUserOwnership, async (c) => {
+usersRoutes.patch('/:id', verifyJwt, validateUserOwnership, async (c) => {
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(
     updateUserByIdRequestSchema,
-    { ...body, id: c.req.param("id") },
-    ["password"]
+    { ...body, id: c.req.param('id') },
+    ['password']
   );
 
   if (schemaError) {
@@ -85,42 +74,20 @@ usersRoutes.patch("/:id", verifyJwt, validateUserOwnership, async (c) => {
   return c.json(response.data, response.code);
 });
 
-usersRoutes.delete("/:id", verifyJwt, validateUserOwnership, async (c) => {
-  const [schemaError, parsedSchema] = validateSchema(getUserByIdRequestSchema, {
-    id: c.req.param("id"),
+usersRoutes.delete('/:id', verifyJwt, validateUserOwnership, async (c) => {
+  const [schemaError, parsedSchema] = validateSchema(softDeleteUserByIdRequestSchema, {
+    id: c.req.param('id')
   });
 
   if (schemaError) {
     return c.json({ message: schemaError.message }, schemaError.code);
   }
 
-  const [error] = await deleteUserById(parsedSchema.data);
+  const [error, response] = await softDeleteUserById(parsedSchema.data);
 
   if (error) {
     return c.json({ message: error.message }, error.code);
   }
 
-  return c.status(204);
-});
-
-usersRoutes.post("/login", async (c) => {
-  const body = await c.req.json();
-
-  const [schemaError, parsedSchema] = validateSchema(
-    authenticateUserRequestSchema,
-    body,
-    ["password"]
-  );
-
-  if (schemaError) {
-    return c.json({ message: schemaError.message }, schemaError.code);
-  }
-
-  const [error, response] = await authenticateUser(parsedSchema.data);
-
-  if (error) {
-    return c.json({ message: error.message }, error.code);
-  }
-
-  return c.json(response.data, response.code);
+  return c.status(response.code);
 });

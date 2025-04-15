@@ -1,32 +1,31 @@
-import type { ContentfulStatusCode } from "hono/utils/http-status";
-import type { ZodSchema, z } from "zod";
-import { zodCustomErrorMap } from "../dtos/zod-custom-error-map.ts";
+import type { ZodSchema, z } from 'zod';
+
+import { type ErrorStatusCode, STATUS_CODES } from '../infra/http/status-code.ts';
+import { zodCustomErrorMap } from '../schemas/zod-custom-error-map.ts';
 
 export const validateSchema = <Schema extends ZodSchema>(
   schema: Schema,
   data: Record<keyof z.infer<Schema>, unknown>,
   fields: Array<keyof z.infer<Schema>> = []
-):
-  | [null, { data: z.infer<Schema> }]
-  | [{ message: any; code: ContentfulStatusCode }, null] => {
+): [null, { data: z.infer<Schema> }] | [{ message: any; code: ErrorStatusCode }, null] => {
   const result = schema.safeParse(data, {
-    errorMap: zodCustomErrorMap(fields),
+    errorMap: zodCustomErrorMap(fields)
   });
 
   if (result.error) {
     return [
       {
         message: Object.values(result.error.flatten().fieldErrors).flat(),
-        code: 400,
+        code: STATUS_CODES.BAD_REQUEST
       },
-      null,
+      null
     ];
   }
 
   return [
     null,
     {
-      data: result.data,
-    },
+      data: result.data
+    }
   ];
 };

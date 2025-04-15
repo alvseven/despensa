@@ -1,57 +1,49 @@
-import { type ZodErrorMap, z, ZodSchema, ZodType } from "zod";
+import { type ZodErrorMap, type ZodSchema, ZodType, z } from 'zod';
 
-type Error = Parameters<ZodErrorMap>["0"];
-type Ctx = Parameters<ZodErrorMap>["1"];
+type Error = Parameters<ZodErrorMap>['0'];
+type Ctx = Parameters<ZodErrorMap>['1'];
 type Field = string | number | undefined;
 
-const handleInvalidTypeError = (
-  error: z.ZodInvalidTypeIssue,
-  ctx: Ctx,
-  field: Field
-) => {
+const handleInvalidTypeError = (error: z.ZodInvalidTypeIssue, ctx: Ctx, field: Field) => {
   const { received, expected } = error;
 
-  if (received === "undefined") {
+  if (received === 'undefined') {
     return { message: `The field '${field}' is required` };
   }
 
   switch (expected) {
-    case "string":
+    case 'string':
       return { message: `The field '${field}' should be a string` };
 
-    case "number":
+    case 'number':
       return { message: `The field '${field}' should be a number` };
   }
 
   return { message: ctx.defaultError };
 };
 
-const handleTooSmallError = (
-  error: z.ZodTooSmallIssue,
-  ctx: Ctx,
-  field: Field
-) => {
+const handleTooSmallError = (error: z.ZodTooSmallIssue, ctx: Ctx, field: Field) => {
   const { type, minimum } = error;
 
   switch (type) {
-    case "string":
+    case 'string':
       if (error.exact) {
         return {
-          message: `The field '${field}' should contain ${minimum} characters`,
+          message: `The field '${field}' should contain ${minimum} characters`
         };
       }
       return {
-        message: `The field '${field}' should contain at least ${minimum} characters`,
+        message: `The field '${field}' should contain at least ${minimum} characters`
       };
 
-    case "number":
+    case 'number':
       if (error.exact) {
         return {
-          message: `The field '${field}' should be greater than ${minimum}`,
+          message: `The field '${field}' should be greater than ${minimum}`
         };
       }
       return {
-        message: `The field '${field}' should be greater or equal to ${minimum}`,
+        message: `The field '${field}' should be greater or equal to ${minimum}`
       };
   }
 
@@ -62,42 +54,38 @@ const handleTooBigError = (error: z.ZodTooBigIssue, ctx: Ctx, field: Field) => {
   const { type, maximum } = error;
 
   switch (type) {
-    case "string":
+    case 'string':
       if (error.exact) {
         return {
-          message: `The field '${field}' should contain ${maximum} characters`,
+          message: `The field '${field}' should contain ${maximum} characters`
         };
       }
       return {
-        message: `The field '${field}' should contain at most ${maximum} characters`,
+        message: `The field '${field}' should contain at most ${maximum} characters`
       };
 
-    case "number":
+    case 'number':
       if (error.exact) {
         return {
-          message: `The field '${field}' should be equal to ${maximum}`,
+          message: `The field '${field}' should be equal to ${maximum}`
         };
       }
       return {
-        message: `The field '${field}' should be less or equal to ${maximum}`,
+        message: `The field '${field}' should be less or equal to ${maximum}`
       };
   }
 
   return { message: ctx.defaultError };
 };
 
-const handleInvalidStringError = (
-  error: z.ZodInvalidStringIssue,
-  ctx: Ctx,
-  field: Field
-) => {
+const handleInvalidStringError = (error: z.ZodInvalidStringIssue, ctx: Ctx, field: Field) => {
   const { validation } = error;
 
   switch (validation) {
-    case "email":
+    case 'email':
       return { message: `The field '${field}' should be a valid email` };
 
-    case "uuid":
+    case 'uuid':
       return { message: `The field '${field}' should be a valid UUID` };
 
     default:
