@@ -3,7 +3,6 @@ name: Lint
 on:
   workflow_run:
     workflows: ["Types"]
-    branches: [main]
     types: 
       - completed
 env:
