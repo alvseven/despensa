@@ -11,7 +11,10 @@ import {
   Text
 } from '@react-email/components';
 
-export function VerifyEmailTemplate({ name, verificationCode }: { name: string; verificationCode: string }) {
+export function VerifyEmailTemplate({
+  name,
+  verificationCode
+}: { name: string; verificationCode: string }) {
   return (
     <Html lang="pt-BR">
       <Tailwind>
