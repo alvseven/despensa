@@ -2,7 +2,7 @@ import { phoneNumberRegex } from '@/shared/constants/phone.ts';
 import { z } from 'zod';
 
 export const verifyPhoneNumberRequestSchema = z.object({
-  phoneNumber: z.string().regex(phoneNumberRegex),
+  phoneNumber: z.string().regex(phoneNumberRegex, 'Invalid phone number'),
   verificationCode: z.string().length(6)
 });
 

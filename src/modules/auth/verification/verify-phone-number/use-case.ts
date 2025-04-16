@@ -21,9 +21,7 @@ export async function verifyPhoneNumber({ phoneNumber, verificationCode }: Verif
     return errorResponse('Invalid verification code', STATUS_CODES.UNAUTHORIZED);
   }
 
-  const isVerificationCodeValid =
-    verificationCodeFound.code === verificationCode &&
-    verificationCodeFound.identifier === phoneNumber;
+  const isVerificationCodeValid = verificationCodeFound.identifier === phoneNumber;
 
   const isCodeUsed = verificationCodeFound.usedAt;
 

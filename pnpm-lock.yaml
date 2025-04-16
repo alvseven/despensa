@@ -11,6 +11,9 @@ dependencies:
   '@aws-sdk/client-sqs':
     specifier: ^3.787.0
     version: 3.787.0
+  '@date-fns/tz':
+    specifier: ^1.2.0
+    version: 1.2.0
   '@hono/node-server':
     specifier: ^1.13.8
     version: 1.14.1(hono@4.7.7)
@@ -20,6 +23,9 @@ dependencies:
   bcryptjs:
     specifier: ^3.0.2
     version: 3.0.2
+  date-fns:
+    specifier: ^4.1.0
+    version: 4.1.0
   dotenv:
     specifier: ^16.4.7
     version: 16.5.0
@@ -641,6 +647,10 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@date-fns/tz@1.2.0:
+    resolution: {integrity: sha512-LBrd7MiJZ9McsOgxqWX7AaxrDjcFVjWH/tIKJd7pnR7McaslGYOP1QmmiBXdJH/H/yLCT+rcQ7FaPBUxRGUtrg==}
+    dev: false
 
   /@drizzle-team/brocli@0.10.2:
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
@@ -2229,6 +2239,10 @@ packages:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+    dev: false
+
+  /date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
     dev: false
 
   /debug@4.4.0:

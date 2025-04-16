@@ -1,6 +1,8 @@
 import { eq } from 'drizzle-orm';
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { db } from '../index.ts';
+import type * as schema from '../schemas/index.ts';
 import { type User, users } from '../schemas/users.ts';
 
 export const usersRepository = () => {
@@ -61,8 +63,8 @@ export const usersRepository = () => {
       .returning();
   };
 
-  const setUserEmailVerified = async (id: User['id']) => {
-    return await db.update(users).set({ isEmailVerified: true }).where(eq(users.id, id));
+  const setUserEmailVerified = async (id: User['id'], tx: NodePgDatabase<typeof schema> = db) => {
+    return await tx.update(users).set({ isEmailVerified: true }).where(eq(users.id, id));
   };
 
   const setUserPhoneVerified = async (id: User['id']) => {

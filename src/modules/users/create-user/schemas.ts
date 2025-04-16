@@ -13,7 +13,7 @@ export const createUserRequestSchema = z
     {
       name: z.string().min(1),
       email: z.string().email(),
-      phoneNumber: z.string().regex(phoneNumberRegex),
+      phoneNumber: z.string().regex(phoneNumberRegex, 'Invalid phone number'),
       avatarUrl: z.string().url(),
       password: z
         .string({

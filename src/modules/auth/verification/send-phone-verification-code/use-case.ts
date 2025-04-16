@@ -8,23 +8,32 @@ import { snsClient } from '@/shared/infra/aws/sns-client.ts';
 import { successResponse } from '@/shared/infra/http/api-response.ts';
 import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
 import { PublishCommand } from '@aws-sdk/client-sns';
+import { TZDate } from '@date-fns/tz';
 import { addMinutes } from 'date-fns';
 
 export async function sendPhoneVerificationCode({ phoneNumber }: SendPhoneVerificationCodeInput) {
-  const { createValidation } = validationRepository();
+  const { createValidation, getValidationByIdentifier, setValidationCodeAsExpired } =
+    validationRepository();
 
-  const { otp } = generateOTPCode();
+  const otp = generateOTPCode();
+  const timezoneDate = new TZDate(new Date(), 'America/Sao_Paulo');
+
+  const validationAlreadyExists = await getValidationByIdentifier(phoneNumber);
+
+  if (validationAlreadyExists) {
+    await setValidationCodeAsExpired(validationAlreadyExists.code);
+  }
 
   await createValidation({
     code: otp,
     identifier: phoneNumber,
     type: 'phone',
-    expiresAt: addMinutes(new Date(), envs.SMS_EXPIRES_IN)
+    expiresAt: addMinutes(timezoneDate, envs.SMS_VERIFICATION_CODE_EXPIRES_IN)
   });
 
   await snsClient.send(
     new PublishCommand({
-      Message: `Por favor, confirme seu número de telefone digitando o código: ${otp}`,
+      Message: `Despensa: Por favor, confirme seu número de telefone digitando o código: ${otp}`,
       PhoneNumber: phoneNumber
     })
   );

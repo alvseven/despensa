@@ -7,19 +7,28 @@ import { generateOTPCode } from '@/shared/helpers/generate-otp-code.ts';
 import { successResponse } from '@/shared/infra/http/api-response.ts';
 import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
 import { mailer } from '@/shared/infra/mailer/index.ts';
+import { TZDate } from '@date-fns/tz';
 import { render } from '@react-email/components';
 import { addMinutes } from 'date-fns';
 
 export async function sendEmailVerificationCode({ name, email }: SendEmailVerificationCodeInput) {
-  const { createValidation } = validationRepository();
+  const { createValidation, getValidationByIdentifier, setValidationCodeAsExpired } =
+    validationRepository();
 
-  const { otp } = generateOTPCode();
+  const validationAlreadyExists = await getValidationByIdentifier(email);
+
+  if (validationAlreadyExists) {
+    await setValidationCodeAsExpired(validationAlreadyExists.code);
+  }
+
+  const otp = generateOTPCode();
+  const timezoneDate = new TZDate(new Date(), 'America/Sao_Paulo');
 
   await createValidation({
     code: otp,
     identifier: email,
     type: 'email',
-    expiresAt: addMinutes(new Date(), envs.EMAIL_EXPIRES_IN)
+    expiresAt: addMinutes(timezoneDate, envs.EMAIL_VERIFICATION_CODE_EXPIRES_IN)
   });
 
   const emailMessage = await render(VerifyEmailTemplate({ name, verificationCode: otp }));

@@ -21,8 +21,8 @@ const envsSchema = z.object({
   AWS_SNS_SECRET_ACCESS_KEY: z.string(),
   AWS_SNS_REGION: z.string(),
   RESEND_API_KEY: z.string(),
-  SMS_EXPIRES_IN: z.coerce.number(),
-  EMAIL_EXPIRES_IN: z.coerce.number()
+  SMS_VERIFICATION_CODE_EXPIRES_IN: z.coerce.number(),
+  EMAIL_VERIFICATION_CODE_EXPIRES_IN: z.coerce.number()
 });
 
 export const envs = Object.freeze(envsSchema.parse(process.env));

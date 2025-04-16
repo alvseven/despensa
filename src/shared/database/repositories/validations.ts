@@ -1,6 +1,8 @@
 import { eq } from 'drizzle-orm';
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { db } from '../index.ts';
+import type * as schema from '../schemas/index.ts';
 import { type Validation, validations } from '../schemas/validations.ts';
 
 export const validationRepository = () => {
@@ -12,6 +14,26 @@ export const validationRepository = () => {
     return createdValidation;
   };
 
+  const getValidationByIdentifier = async (identifier: Validation['identifier']) => {
+    const [validation] = await db
+      .select()
+      .from(validations)
+      .where(eq(validations.identifier, identifier));
+
+    return validation;
+  };
+
+  const setValidationCodeAsUsed = async (
+    code: Validation['code'],
+    tx: NodePgDatabase<typeof schema> = db
+  ) => {
+    await tx.update(validations).set({ usedAt: new Date() }).where(eq(validations.code, code));
+  };
+
+  const setValidationCodeAsExpired = async (code: Validation['code']) => {
+    await db.update(validations).set({ expiresAt: new Date() }).where(eq(validations.code, code));
+  };
+
   const getValidationByCode = async (code: Validation['code']) => {
     const [validation] = await db.select().from(validations).where(eq(validations.code, code));
 
@@ -21,13 +43,10 @@ export const validationRepository = () => {
   const updateValidationByCode = async (
     validation: Pick<Validation, 'code' | 'identifier' | 'type'>
   ) => {
-    const [updatedValidation] = await db
+    return await db
       .update(validations)
       .set(validation)
-      .where(eq(validations.code, validation.code))
-      .returning();
-
-    return updatedValidation;
+      .where(eq(validations.code, validation.code));
   };
 
   const deleteValidationByCode = async (code: Validation['code']) => {
@@ -36,6 +55,9 @@ export const validationRepository = () => {
 
   return {
     createValidation,
+    getValidationByIdentifier,
+    setValidationCodeAsUsed,
+    setValidationCodeAsExpired,
     getValidationByCode,
     updateValidationByCode,
     deleteValidationByCode
