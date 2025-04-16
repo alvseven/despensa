@@ -3,8 +3,8 @@ import { date, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { randomUUID } from 'node:crypto';
 
-import { users } from './users.ts';
 import { notifications } from './notifications.ts';
+import { users } from './users.ts';
 
 export const products = pgTable('products', {
   id: text('id').$defaultFn(randomUUID).primaryKey(),
@@ -26,5 +26,5 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     fields: [products.userId],
     references: [users.id]
   }),
-  notifications: many(notifications),
+  notifications: many(notifications)
 }));
