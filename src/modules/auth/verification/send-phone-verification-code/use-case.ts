@@ -13,10 +13,10 @@ import { addMinutes } from 'date-fns';
 export async function sendPhoneVerificationCode({ phoneNumber }: SendPhoneVerificationCodeInput) {
   const { createValidation } = validationRepository();
 
-  const verificationCode = generateOTPCode();
+  const {otp} = generateOTPCode();
 
   await createValidation({
-    code: verificationCode,
+    code: otp,
     identifier: phoneNumber,
     type: 'phone',
     expiresAt: addMinutes(new Date(), envs.SMS_EXPIRES_IN)
@@ -24,7 +24,7 @@ export async function sendPhoneVerificationCode({ phoneNumber }: SendPhoneVerifi
 
   await snsClient.send(
     new PublishCommand({
-      Message: `Por favor, confirme seu número de telefone digitando o código: ${verificationCode}`,
+      Message: `Por favor, confirme seu número de telefone digitando o código: ${otp}`,
       PhoneNumber: phoneNumber
     })
   );
