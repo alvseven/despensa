@@ -11,7 +11,7 @@ import {
   Text
 } from '@react-email/components';
 
-export function VerifyEmailTemplate({ verificationCode }: { verificationCode: string }) {
+export function VerifyEmailTemplate({ name, verificationCode }: { name: string; verificationCode: string }) {
   return (
     <Html lang="pt-BR">
       <Tailwind>
@@ -26,7 +26,7 @@ export function VerifyEmailTemplate({ verificationCode }: { verificationCode: st
                 Bem-vindo ao Despensa!
               </Heading>
 
-              <Text className="text-[16px] text-gray-600 mt-[16px] mb-[24px]">Olá,</Text>
+              <Text className="text-[16px] text-gray-600 mt-[16px] mb-[24px]">Olá, {name},</Text>
 
               <Text className="text-[16px] text-gray-600 mb-[12px]">
                 Obrigado por se cadastrar no Despensa, o aplicativo que vai te ajudar a gerenciar
@@ -41,15 +41,11 @@ export function VerifyEmailTemplate({ verificationCode }: { verificationCode: st
               <Section className="text-center mb-[32px]">
                 <Button
                   className="bg-emerald-600 text-white font-bold py-[12px] px-[24px] rounded-[4px] no-underline text-center box-border"
-                  href={`https://app.despensa.com.br/verificar?token=${verificationCode}`}
+                  href={`https://app.despensa.com.br/verify-email?token=${verificationCode}`}
                 >
                   Confirmar meu email
                 </Button>
               </Section>
-
-              <Text className="text-[14px] text-gray-600 mb-[12px]">
-                Se você não solicitou esta verificação, pode ignorar este email com segurança.
-              </Text>
 
               <Text className="text-[14px] text-gray-600 mb-[24px]">
                 O link de confirmação expira em 24 horas. Caso o botão acima não funcione, copie e
@@ -57,7 +53,11 @@ export function VerifyEmailTemplate({ verificationCode }: { verificationCode: st
               </Text>
 
               <Text className="text-[14px] text-gray-500 mb-[32px] break-all">
-                {`https://app.despensa.com.br/verificar?token=${verificationCode}`}
+                {`https://app.despensa.com.br/verify-email?token=${verificationCode}`}
+              </Text>
+
+              <Text className="text-[14px] text-gray-600 mb-[12px]">
+                Se você não solicitou esta verificação, pode ignorar este email com segurança.
               </Text>
 
               <Text className="text-[16px] text-gray-600 mb-[8px]">Atenciosamente,</Text>

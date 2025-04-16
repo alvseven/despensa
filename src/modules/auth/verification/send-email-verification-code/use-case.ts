@@ -10,7 +10,7 @@ import { mailer } from '@/shared/infra/mailer/index.ts';
 import { render } from '@react-email/components';
 import { addMinutes } from 'date-fns';
 
-export async function sendEmailVerificationCode({ email }: SendEmailVerificationCodeInput) {
+export async function sendEmailVerificationCode({ name, email }: SendEmailVerificationCodeInput) {
   const { createValidation } = validationRepository();
 
   const { otp } = generateOTPCode();
@@ -22,7 +22,7 @@ export async function sendEmailVerificationCode({ email }: SendEmailVerification
     expiresAt: addMinutes(new Date(), envs.EMAIL_EXPIRES_IN)
   });
 
-  const emailMessage = await render(VerifyEmailTemplate({ verificationCode: otp }));
+  const emailMessage = await render(VerifyEmailTemplate({ name, verificationCode: otp }));
 
   await mailer.emails.send({
     from: 'Despensa <onboarding@resend.dev>',
