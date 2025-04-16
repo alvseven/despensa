@@ -13,7 +13,7 @@ import { addMinutes } from 'date-fns';
 export async function sendPhoneVerificationCode({ phoneNumber }: SendPhoneVerificationCodeInput) {
   const { createValidation } = validationRepository();
 
-  const {otp} = generateOTPCode();
+  const { otp } = generateOTPCode();
 
   await createValidation({
     code: otp,

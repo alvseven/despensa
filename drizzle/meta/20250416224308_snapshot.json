@@ -86,16 +86,12 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "users_phone_number_unique": {
           "name": "users_phone_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "phone_number"
-          ]
+          "columns": ["phone_number"]
         }
       },
       "policies": {},
@@ -163,12 +159,8 @@
           "name": "products_user_id_users_id_fk",
           "tableFrom": "products",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -236,12 +228,8 @@
           "name": "notifications_user_id_users_id_fk",
           "tableFrom": "notifications",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -249,12 +237,8 @@
           "name": "notifications_product_id_products_id_fk",
           "tableFrom": "notifications",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -315,9 +299,7 @@
         "validations_identifier_unique": {
           "name": "validations_identifier_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "identifier"
-          ]
+          "columns": ["identifier"]
         }
       },
       "policies": {},
@@ -329,20 +311,12 @@
     "public.notification_status": {
       "name": "notification_status",
       "schema": "public",
-      "values": [
-        "created",
-        "scheduled",
-        "sent",
-        "failed"
-      ]
+      "values": ["created", "scheduled", "sent", "failed"]
     },
     "public.validation_types": {
       "name": "validation_types",
       "schema": "public",
-      "values": [
-        "phone",
-        "email"
-      ]
+      "values": ["phone", "email"]
     }
   },
   "schemas": {},
