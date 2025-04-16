@@ -1,6 +1,6 @@
 {
-  "id": "b5d0bb57-1cc0-4c57-bc7b-297ef880e1eb",
-  "prevId": "cf8c0dfb-e44b-428b-9efc-eaf3b707914c",
+  "id": "90d1f680-887b-4225-bdb7-3a0816dfd6df",
+  "prevId": "13a98b1e-90e8-403b-93b3-5c009df9283d",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -205,15 +205,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "notifications_user_id_products_user_id_fk": {
-          "name": "notifications_user_id_products_user_id_fk",
+        "notifications_user_id_users_id_fk": {
+          "name": "notifications_user_id_users_id_fk",
           "tableFrom": "notifications",
-          "tableTo": "products",
+          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
           "columnsTo": [
-            "user_id"
+            "id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"

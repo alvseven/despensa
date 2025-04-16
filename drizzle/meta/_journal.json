@@ -19,22 +19,8 @@
     {
       "idx": 2,
       "version": "7",
-      "when": 1744763635800,
-      "tag": "20250416003355_create-table-notifications",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1744763808171,
-      "tag": "20250416003648_fix-user-id-reference-in-notifications-table",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1744765745991,
-      "tag": "20250416010905_fix-notifications-relations",
+      "when": 1744839367784,
+      "tag": "20250416213607_create-table-notifications",
       "breakpoints": true
     }
   ]
