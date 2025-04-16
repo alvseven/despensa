@@ -11,8 +11,8 @@ import { updateUserById } from './update-user/use-case.ts';
 
 import { verifyJwt } from '../auth/middlewares/verify-token.ts';
 
-import { validateSchema } from '../../shared/helpers/validate-schema.ts';
-import { validateUserOwnership } from '../../shared/infra/http/middlewares/validate-user-ownership.ts';
+import { validateSchema } from '@/shared/helpers/validate-schema.ts';
+import { validateUserOwnership } from '@/shared/infra/http/middlewares/validate-user-ownership.ts';
 
 export const usersRoutes = new Hono();
 

@@ -5,7 +5,7 @@ import {
   oneNumberRegex,
   oneSpecialCharacterRegex,
   oneUpperCaseLetterRegex
-} from '../../../shared/constants/password.ts';
+} from '@/shared/constants/password.ts';
 
 export const updateUserByIdRequestSchema = z.object({
   id: z.string().uuid(),

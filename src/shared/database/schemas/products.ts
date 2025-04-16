@@ -2,6 +2,8 @@ import { type InferSelectModel, relations } from 'drizzle-orm';
 import { date, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { randomUUID } from 'node:crypto';
+
+import { notifications } from './notifications.ts';
 import { users } from './users.ts';
 
 export const products = pgTable('products', {
@@ -19,9 +21,10 @@ export const products = pgTable('products', {
 
 export type Product = InferSelectModel<typeof products>;
 
-export const productsRelations = relations(products, ({ one }) => ({
+export const productsRelations = relations(products, ({ one, many }) => ({
   user: one(users, {
     fields: [products.userId],
     references: [users.id]
-  })
+  }),
+  notifications: many(notifications)
 }));

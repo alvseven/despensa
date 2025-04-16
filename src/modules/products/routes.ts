@@ -13,7 +13,7 @@ import { updateProductById } from './update-product/use-case.ts';
 
 import { verifyJwt } from '../auth/middlewares/verify-token.ts';
 
-import { validateSchema } from '../../shared/helpers/validate-schema.ts';
+import { validateSchema } from '@/shared/helpers/validate-schema.ts';
 
 export const productsRoutes = new Hono();
 

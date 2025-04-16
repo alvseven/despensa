@@ -1,8 +1,8 @@
 import { createMiddleware } from 'hono/factory';
 import { verify } from 'hono/jwt';
 
-import { envs } from '../../../shared/config/env.ts';
-import { STATUS_CODES } from '../../../shared/infra/http/status-code.ts';
+import { envs } from '@/shared/config/env.ts';
+import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
 
 export const verifyJwt = createMiddleware(async (c, next) => {
   const authHeader = c.req.header('Authorization');

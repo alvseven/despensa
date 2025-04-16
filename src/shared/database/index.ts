@@ -1,5 +1,5 @@
+import { envs } from '@/shared/config/env.ts';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { envs } from '../config/env.ts';
 
 import * as schema from './schemas/index.ts';
 

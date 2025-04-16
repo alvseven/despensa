@@ -1,4 +1,4 @@
-import type { StringToNumber } from '../../helpers/types/string-to-number.ts';
+import type { StringToNumber } from '@/shared/helpers/types/string-to-number.ts';
 
 export const STATUS_CODES = {
   OK: 200,

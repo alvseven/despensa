@@ -1,8 +1,9 @@
-import { productsRepository } from '../repository.ts';
 import type { UpdateProductByIdInput } from './schemas.ts';
 
-import { errorResponse, successResponse } from '../../../shared/infra/http/api-response.ts';
-import { STATUS_CODES } from '../../../shared/infra/http/status-code.ts';
+import { errorResponse, successResponse } from '@/shared/infra/http/api-response.ts';
+import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
+
+import { productsRepository } from '@/shared/database/repositories/products.ts';
 
 export async function updateProductById(product: UpdateProductByIdInput) {
   const { getProductByIdAndUserId, updateProductById } = productsRepository();

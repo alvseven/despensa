@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
+import { zodCustomErrorMap } from '@/shared/config/zod-custom-error-map.ts';
 import {
   oneLowerCaseLetterRegex,
   oneNumberRegex,
   oneSpecialCharacterRegex,
   oneUpperCaseLetterRegex
-} from '../../../shared/constants/password.ts';
-import { zodCustomErrorMap } from '../../../shared/schemas/zod-custom-error-map.ts';
+} from '@/shared/constants/password.ts';
 
 export const createUserRequestSchema = z
   .object(
