@@ -12,6 +12,7 @@ services:
       - ./drizzle.config.ts:/app/drizzle.config.ts
       - ./package.json:/app/package.json
       - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
+      - ./tsconfig.json:/app/tsconfig.json
 
   api:
     container_name: api
