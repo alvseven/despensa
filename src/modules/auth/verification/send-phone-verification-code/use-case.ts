@@ -1,26 +1,30 @@
 import { sendSMSNotification } from '@/modules/notifications/send-sms-notification/use-case.ts';
 import type { SendPhoneVerificationCodeInput } from './schemas.ts';
 
-import { validationRepository } from '@/shared/database/repositories/validation.ts';
+import { envs } from '@/shared/config/env.ts';
+import { validationRepository } from '@/shared/database/repositories/validations.ts';
+import { generateOTPCode } from '@/shared/helpers/generate-otp-code.ts';
 import { snsClient } from '@/shared/infra/aws/sns-client.ts';
 import { successResponse } from '@/shared/infra/http/api-response.ts';
 import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
 import { PublishCommand } from '@aws-sdk/client-sns';
+import { addMinutes } from 'date-fns';
 
 export async function sendPhoneVerificationCode({ phoneNumber }: SendPhoneVerificationCodeInput) {
   const { createValidation } = validationRepository();
 
-  const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const verificationCode = generateOTPCode();
 
   await createValidation({
     code: verificationCode,
     identifier: phoneNumber,
-    type: 'phone'
+    type: 'phone',
+    expiresAt: addMinutes(new Date(), envs.SMS_EXPIRES_IN)
   });
 
   await snsClient.send(
     new PublishCommand({
-      Message: `Verify your phone number by entering the code: ${verificationCode}`,
+      Message: `Por favor, confirme seu número de telefone digitando o código: ${verificationCode}`,
       PhoneNumber: phoneNumber
     })
   );

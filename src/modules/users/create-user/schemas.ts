@@ -7,13 +7,13 @@ import {
   oneSpecialCharacterRegex,
   oneUpperCaseLetterRegex
 } from '@/shared/constants/password.ts';
-
+import { phoneNumberRegex } from '@/shared/constants/phone.ts';
 export const createUserRequestSchema = z
   .object(
     {
       name: z.string().min(1),
       email: z.string().email(),
-      phoneNumber: z.string().min(10).max(15),
+      phoneNumber: z.string().regex(phoneNumberRegex),
       avatarUrl: z.string().url(),
       password: z
         .string({

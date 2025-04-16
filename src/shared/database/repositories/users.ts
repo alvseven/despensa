@@ -54,15 +54,19 @@ export const usersRepository = () => {
   };
 
   const softDeleteUserById = async (id: User['id']) => {
-    return db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, id)).returning();
+    return await db
+      .update(users)
+      .set({ deletedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
   };
 
   const setUserEmailVerified = async (id: User['id']) => {
-    return db.update(users).set({ isEmailVerified: true }).where(eq(users.id, id)).returning();
+    return await db.update(users).set({ isEmailVerified: true }).where(eq(users.id, id));
   };
 
   const setUserPhoneVerified = async (id: User['id']) => {
-    return db.update(users).set({ isPhoneVerified: true }).where(eq(users.id, id)).returning();
+    return await db.update(users).set({ isPhoneVerified: true }).where(eq(users.id, id));
   };
 
   return {
