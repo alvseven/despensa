@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
+import { TZDate } from '@date-fns/tz';
 import { db } from '../index.ts';
 import type * as schema from '../schemas/index.ts';
 import { type Validation, validations } from '../schemas/validations.ts';
-import { TZDate } from '@date-fns/tz';
 
 export const validationRepository = () => {
   const createValidation = async (
@@ -36,7 +36,10 @@ export const validationRepository = () => {
   const setValidationCodeAsExpired = async (code: Validation['code']) => {
     const expiresAtDate = new TZDate(new Date(), 'America/Sao_Paulo');
 
-    await db.update(validations).set({ expiresAt: expiresAtDate }).where(eq(validations.code, code));
+    await db
+      .update(validations)
+      .set({ expiresAt: expiresAtDate })
+      .where(eq(validations.code, code));
   };
 
   const getValidationByCode = async (code: Validation['code']) => {

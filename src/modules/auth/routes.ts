@@ -34,7 +34,7 @@ authRoutes.post('/login', async (c) => {
   return c.json(response.data, response.code);
 });
 
-authRoutes.post('/emails/verify', async (c) => {  
+authRoutes.post('/emails/verify', async (c) => {
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(verifyEmailRequestSchema, body);
@@ -56,7 +56,7 @@ authRoutes.post('/phone-numbers/verify', async (c) => {
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(verifyPhoneNumberRequestSchema, body, [
-    'phoneNumber',
+    'phoneNumber'
   ]);
 
   if (schemaError) {
