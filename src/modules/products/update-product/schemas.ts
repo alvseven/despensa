@@ -20,7 +20,8 @@ export const updateProductByIdRequestSchema = z.object({
     {
       message: 'Invalid date format. Please use YYYY-MM-DD format.'
     }
-  ),  category: z.string(),
+  ),
+  category: z.string(),
   expiresAt: z.string().refine(
     (date) => {
       const currentDate = new TZDate(new Date(), 'America/Sao_Paulo');
@@ -33,6 +34,7 @@ export const updateProductByIdRequestSchema = z.object({
     {
       message: 'Invalid date format. Please use YYYY-MM-DD format.'
     }
-  )});
+  )
+});
 
 export type UpdateProductByIdInput = z.infer<typeof updateProductByIdRequestSchema>;
