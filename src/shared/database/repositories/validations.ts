@@ -4,6 +4,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { db } from '../index.ts';
 import type * as schema from '../schemas/index.ts';
 import { type Validation, validations } from '../schemas/validations.ts';
+import { TZDate } from '@date-fns/tz';
 
 export const validationRepository = () => {
   const createValidation = async (
@@ -27,11 +28,15 @@ export const validationRepository = () => {
     code: Validation['code'],
     tx: NodePgDatabase<typeof schema> = db
   ) => {
-    await tx.update(validations).set({ usedAt: new Date() }).where(eq(validations.code, code));
+    const usedAtDate = new TZDate(new Date(), 'America/Sao_Paulo');
+
+    await tx.update(validations).set({ usedAt: usedAtDate }).where(eq(validations.code, code));
   };
 
   const setValidationCodeAsExpired = async (code: Validation['code']) => {
-    await db.update(validations).set({ expiresAt: new Date() }).where(eq(validations.code, code));
+    const expiresAtDate = new TZDate(new Date(), 'America/Sao_Paulo');
+
+    await db.update(validations).set({ expiresAt: expiresAtDate }).where(eq(validations.code, code));
   };
 
   const getValidationByCode = async (code: Validation['code']) => {

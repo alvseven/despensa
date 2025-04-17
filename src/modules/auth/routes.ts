@@ -34,13 +34,10 @@ authRoutes.post('/login', async (c) => {
   return c.json(response.data, response.code);
 });
 
-authRoutes.post('/verify-email', async (c) => {
+authRoutes.post('/emails/verify', async (c) => {  
   const body = await c.req.json();
 
-  const [schemaError, parsedSchema] = validateSchema(verifyEmailRequestSchema, body, [
-    'email',
-    'verificationCode'
-  ]);
+  const [schemaError, parsedSchema] = validateSchema(verifyEmailRequestSchema, body);
 
   if (schemaError) {
     return c.json({ message: schemaError.message }, schemaError.code);
@@ -55,12 +52,11 @@ authRoutes.post('/verify-email', async (c) => {
   return c.status(response.code);
 });
 
-authRoutes.post('/verify-phone-number', async (c) => {
+authRoutes.post('/phone-numbers/verify', async (c) => {
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(verifyPhoneNumberRequestSchema, body, [
     'phoneNumber',
-    'verificationCode'
   ]);
 
   if (schemaError) {
@@ -76,12 +72,10 @@ authRoutes.post('/verify-phone-number', async (c) => {
   return c.status(response.code);
 });
 
-authRoutes.post('/send-email-verification-code', async (c) => {
+authRoutes.post('/emails/verification-code/send', async (c) => {
   const body = await c.req.json();
 
-  const [schemaError, parsedSchema] = validateSchema(sendEmailVerificationCodeRequestSchema, body, [
-    'email'
-  ]);
+  const [schemaError, parsedSchema] = validateSchema(sendEmailVerificationCodeRequestSchema, body);
 
   if (schemaError) {
     return c.json({ message: schemaError.message }, schemaError.code);
@@ -92,7 +86,7 @@ authRoutes.post('/send-email-verification-code', async (c) => {
   return c.status(response.code);
 });
 
-authRoutes.post('/send-phone-verification-code', async (c) => {
+authRoutes.post('/phone-numbers/verification-code/send', async (c) => {
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(sendPhoneVerificationCodeRequestSchema, body, [
