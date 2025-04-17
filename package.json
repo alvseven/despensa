@@ -22,7 +22,7 @@
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.39.3",
+    "drizzle-orm": "^0.42.0",
     "hono": "^4.7.2",
     "pg": "^8.14.0",
     "resend": "^4.3.0",
