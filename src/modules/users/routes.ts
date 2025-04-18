@@ -13,6 +13,8 @@ import { verifyJwt } from '../auth/middlewares/verify-token.ts';
 
 import { validateSchema } from '@/shared/helpers/validate-schema.ts';
 import { validateUserOwnership } from '@/shared/infra/http/middlewares/validate-user-ownership.ts';
+import { createUserWithGoogleRequestSchema } from './create-user-with-google/schemas.ts';
+import { createUserWithGoogle } from './create-user-with-google/use-case.ts';
 
 export const usersRoutes = new Hono();
 
@@ -26,6 +28,24 @@ usersRoutes.post('', async (c) => {
   }
 
   const [error, response] = await createUser(parsedSchema.data);
+
+  if (error) {
+    return c.json({ message: error.message }, error.code);
+  }
+
+  return c.json(response.data, response.code);
+});
+
+usersRoutes.post('/google', async (c) => {
+  const body = await c.req.json();
+
+  const [schemaError, parsedSchema] = validateSchema(createUserWithGoogleRequestSchema, body);
+
+  if (schemaError) {
+    return c.json({ message: schemaError.message }, schemaError.code);
+  }
+
+  const [error, response] = await createUserWithGoogle(parsedSchema.data);
 
   if (error) {
     return c.json({ message: error.message }, error.code);

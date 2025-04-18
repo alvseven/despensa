@@ -4,6 +4,8 @@ import { authenticateUserRequestSchema } from './authenticate/schemas.ts';
 import { authenticateUser } from './authenticate/use-case.ts';
 
 import { validateSchema } from '@/shared/helpers/validate-schema.ts';
+import { createUserWithGoogleRequestSchema } from '../users/create-user-with-google/schemas.ts';
+import { createUserWithGoogle } from '../users/create-user-with-google/use-case.ts';
 import { sendEmailVerificationCodeRequestSchema } from './verification/send-email-verification-code/schemas.ts';
 import { sendEmailVerificationCode } from './verification/send-email-verification-code/use-case.ts';
 import { sendPhoneVerificationCodeRequestSchema } from './verification/send-phone-verification-code/schemas.ts';
@@ -14,7 +16,7 @@ import { verifyPhoneNumberRequestSchema } from './verification/verify-phone-numb
 import { verifyPhoneNumber } from './verification/verify-phone-number/use-case.ts';
 export const authRoutes = new Hono();
 
-authRoutes.post('/login', async (c) => {
+authRoutes.post('/login/password', async (c) => {
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(authenticateUserRequestSchema, body, [
@@ -26,6 +28,24 @@ authRoutes.post('/login', async (c) => {
   }
 
   const [error, response] = await authenticateUser(parsedSchema.data);
+
+  if (error) {
+    return c.json({ message: error.message }, error.code);
+  }
+
+  return c.json(response.data, response.code);
+});
+
+authRoutes.post('/login/google', async (c) => {
+  const body = await c.req.json();
+
+  const [schemaError, parsedSchema] = validateSchema(createUserWithGoogleRequestSchema, body);
+
+  if (schemaError) {
+    return c.json({ message: schemaError.message }, schemaError.code);
+  }
+
+  const [error, response] = await createUserWithGoogle(parsedSchema.data);
 
   if (error) {
     return c.json({ message: error.message }, error.code);
