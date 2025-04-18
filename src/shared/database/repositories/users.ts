@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { db } from '../index.ts';
@@ -40,6 +40,18 @@ export const usersRepository = () => {
     return userFound;
   };
 
+  const getUserByEmailAndProviderId = async (
+    email: User['email'],
+    providerId: NonNullable<User['providerId']>
+  ) => {
+    const [userFound] = await db
+      .select()
+      .from(users)
+      .where(and(eq(users.email, email), eq(users.providerId, providerId)));
+
+    return userFound;
+  };
+
   const getUserByPhoneNumber = async (phoneNumber: User['phoneNumber']) => {
     const [userFound] = await db.select().from(users).where(eq(users.phoneNumber, phoneNumber));
 
@@ -75,6 +87,7 @@ export const usersRepository = () => {
     createUser,
     getUserById,
     getUserByEmail,
+    getUserByEmailAndProviderId,
     getUserByPhoneNumber,
     updateUserById,
     softDeleteUserById,

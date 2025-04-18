@@ -1,8 +1,10 @@
 import { type InferSelectModel, relations } from 'drizzle-orm';
-import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { randomUUID } from 'node:crypto';
 import { products } from './products.ts';
+
+export const providersEnum = pgEnum('provider', ['google']);
 
 export const users = pgTable('users', {
   id: text('id').$defaultFn(randomUUID).primaryKey(),
@@ -11,6 +13,8 @@ export const users = pgTable('users', {
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   phoneNumber: text('phone_number').notNull().unique(),
+  providerId: text('provider_id'),
+  provider: providersEnum('provider'),
   password: text('password').notNull(),
   avatarUrl: text('avatar_url'),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),

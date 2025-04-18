@@ -25,7 +25,7 @@ const envsSchema = z.object({
   EMAIL_VERIFICATION_CODE_EXPIRES_IN: z.coerce.number(),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
-  GOOGLE_REDIRECT_URI: z.string(),
+  GOOGLE_REDIRECT_URI: z.string()
 });
 
 export const envs = Object.freeze(envsSchema.parse(process.env));
