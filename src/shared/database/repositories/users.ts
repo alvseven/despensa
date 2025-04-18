@@ -7,7 +7,7 @@ import { type User, users } from '../schemas/users.ts';
 
 export const usersRepository = () => {
   const createUser = async (
-    user: Pick<User, 'email' | 'password' | 'name' | 'avatarUrl' | 'phoneNumber'>
+    user: Pick<User, 'email' | 'password' | 'name' | 'avatarUrl' > & { phoneNumber?: User['phoneNumber'] }
   ) => {
     const [userCreated] = await db.insert(users).values(user).returning({
       id: users.id,
@@ -19,6 +19,24 @@ export const usersRepository = () => {
 
     return userCreated;
   };
+
+  const createUserWithGoogle = async (
+    user: Pick<User, 'email' | 'name' | 'avatarUrl' | 'phoneNumber' | 'providerId'>
+  ) => {
+    const [userCreated] = await db.insert(users).values({
+      ...user,
+      provider: 'google',
+    }).returning({
+      id: users.id,
+      name: users.name, 
+      email: users.email,
+      avatarUrl: users.avatarUrl,
+      phoneNumber: users.phoneNumber
+    });
+
+    return userCreated;
+  };
+  
 
   const getUserById = async (id: User['id']) => {
     const [userFound] = await db.query.users.findMany({
@@ -52,7 +70,7 @@ export const usersRepository = () => {
     return userFound;
   };
 
-  const getUserByPhoneNumber = async (phoneNumber: User['phoneNumber']) => {
+  const getUserByPhoneNumber = async (phoneNumber: NonNullable<User['phoneNumber']>) => {
     const [userFound] = await db.select().from(users).where(eq(users.phoneNumber, phoneNumber));
 
     return userFound;
@@ -85,6 +103,7 @@ export const usersRepository = () => {
 
   return {
     createUser,
+    createUserWithGoogle,
     getUserById,
     getUserByEmail,
     getUserByEmailAndProviderId,
