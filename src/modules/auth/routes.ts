@@ -4,6 +4,8 @@ import { authenticateUserRequestSchema } from './authenticate/schemas.ts';
 import { authenticateUser } from './authenticate/use-case.ts';
 
 import { validateSchema } from '@/shared/helpers/validate-schema.ts';
+import { createUserWithGoogleRequestSchema } from '../users/create-user-with-google/schemas.ts';
+import { createUserWithGoogle } from '../users/create-user-with-google/use-case.ts';
 import { sendEmailVerificationCodeRequestSchema } from './verification/send-email-verification-code/schemas.ts';
 import { sendEmailVerificationCode } from './verification/send-email-verification-code/use-case.ts';
 import { sendPhoneVerificationCodeRequestSchema } from './verification/send-phone-verification-code/schemas.ts';
@@ -12,8 +14,6 @@ import { verifyEmailRequestSchema } from './verification/verify-email/schemas.ts
 import { verifyEmail } from './verification/verify-email/use-case.ts';
 import { verifyPhoneNumberRequestSchema } from './verification/verify-phone-number/schemas.ts';
 import { verifyPhoneNumber } from './verification/verify-phone-number/use-case.ts';
-import { createUserWithGoogleRequestSchema } from '../users/create-user-with-google/schemas.ts';
-import { createUserWithGoogle } from '../users/create-user-with-google/use-case.ts';
 export const authRoutes = new Hono();
 
 authRoutes.post('/login/password', async (c) => {

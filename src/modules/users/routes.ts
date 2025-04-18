@@ -40,7 +40,7 @@ usersRoutes.post('/google', async (c) => {
   const body = await c.req.json();
 
   const [schemaError, parsedSchema] = validateSchema(createUserWithGoogleRequestSchema, body);
-  
+
   if (schemaError) {
     return c.json({ message: schemaError.message }, schemaError.code);
   }
@@ -52,7 +52,7 @@ usersRoutes.post('/google', async (c) => {
   }
 
   return c.json(response.data, response.code);
-}); 
+});
 
 usersRoutes.get('/:id', verifyJwt, validateUserOwnership, async (c) => {
   const [schemaError, parsedSchema] = validateSchema(getUserByIdRequestSchema, {
