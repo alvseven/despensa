@@ -22,7 +22,7 @@ export async function sendEmailVerificationCode({ name, email }: SendEmailVerifi
   }
 
   const otp = generateOTPCode();
-  const timezoneDate = new TZDate(new Date(), 'America/Sao_Paulo');
+  const timezoneDate = new TZDate(new Date());
 
   await createValidation({
     code: otp,

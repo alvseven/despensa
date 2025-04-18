@@ -11,6 +11,12 @@ export const notificationsRepository = () => {
     return notificationCreated;
   };
 
+  const getNotificationById = async (id: Notification['id']) => {
+    const [notification] = await db.select().from(notifications).where(eq(notifications.id, id));
+
+    return notification;
+  };
+
   const updateNotificationById = async (
     id: Notification['id'],
     notification: Pick<Notification, 'notifyAt'> | Pick<Notification, 'status'>
@@ -31,6 +37,8 @@ export const notificationsRepository = () => {
       .from(notifications)
       .where(eq(notifications.status, 'created'))
       .execute();
+
+      // TODO status === created AND notifyAt === today
   };
 
   const scheduleNotification = async (id: Notification['id']) => {
@@ -65,6 +73,7 @@ export const notificationsRepository = () => {
 
   return {
     createNotification,
+    getNotificationById,
     updateNotificationById,
     getPendingNotifications,
     scheduleNotification,
