@@ -7,7 +7,9 @@ import { type User, users } from '../schemas/users.ts';
 
 export const usersRepository = () => {
   const createUser = async (
-    user: Pick<User, 'email' | 'password' | 'name' | 'avatarUrl' > & { phoneNumber?: User['phoneNumber'] }
+    user: Pick<User, 'email' | 'password' | 'name' | 'avatarUrl'> & {
+      phoneNumber?: User['phoneNumber'];
+    }
   ) => {
     const [userCreated] = await db.insert(users).values(user).returning({
       id: users.id,
@@ -23,20 +25,22 @@ export const usersRepository = () => {
   const createUserWithGoogle = async (
     user: Pick<User, 'email' | 'name' | 'avatarUrl' | 'phoneNumber' | 'providerId'>
   ) => {
-    const [userCreated] = await db.insert(users).values({
-      ...user,
-      provider: 'google',
-    }).returning({
-      id: users.id,
-      name: users.name, 
-      email: users.email,
-      avatarUrl: users.avatarUrl,
-      phoneNumber: users.phoneNumber
-    });
+    const [userCreated] = await db
+      .insert(users)
+      .values({
+        ...user,
+        provider: 'google'
+      })
+      .returning({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        avatarUrl: users.avatarUrl,
+        phoneNumber: users.phoneNumber
+      });
 
     return userCreated;
   };
-  
 
   const getUserById = async (id: User['id']) => {
     const [userFound] = await db.query.users.findMany({

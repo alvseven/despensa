@@ -33,7 +33,7 @@ export async function createUserWithGoogle({ code, phoneNumber }: CreateUserWith
       name: googleUser.name,
       phoneNumber,
       providerId: googleUser.id,
-      avatarUrl: googleUser.picture,
+      avatarUrl: googleUser.picture
     });
 
     return successResponse(createdUser, STATUS_CODES.CREATED);
