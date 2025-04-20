@@ -9,7 +9,7 @@ type ErrorResult<Code extends ErrorStatusCode> = [
 ];
 
 type SuccessResult<
-  T extends Record<string, unknown> | boolean | any[],
+  T extends Record<string, unknown> | boolean | unknown[],
   Code extends SuccessStatusCode
 > = [
   null,
@@ -20,7 +20,7 @@ type SuccessResult<
 ];
 
 export const successResponse = <
-  T extends Record<string, unknown> | boolean | any[],
+  T extends Record<string, unknown> | boolean | unknown[],
   Code extends SuccessStatusCode
 >(
   data: T,

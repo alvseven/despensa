@@ -1,4 +1,16 @@
 {
   "$schema": "https://biomejs.dev/schemas/latest/schema.json",
-  "extends": ["@arthurfiorette/biomejs-config"]
+  "extends": ["@arthurfiorette/biomejs-config"],
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noExplicitAny": "error"
+      }
+    }
+  },
+  "files": {
+    "ignore": ["aws/lambdas/*"]
+  }
 }
