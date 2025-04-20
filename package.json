@@ -12,8 +12,7 @@
     "lint:ci": "biome ci .",
     "lint:fix": "biome check --write --unsafe .",
     "types:ci": "tsc --noEmit",
-    "lambda:build": "tsup aws/lambdas/process-pending-notifications.ts --out-dir dist --format esm --minify",
-    "lambda:zip": "pnpm build:lambda && cd dist && zip -r ../dist/process-pending-notifications.zip ."
+    "lambdas:build-and-zip": "tsx build-lambdas.ts"
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.787.0",

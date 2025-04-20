@@ -18,7 +18,7 @@ export async function sendSMSNotification({
   const { markNotificationAsSent, markNotificationAsFailed } = notificationsRepository();
 
   try {
-    await snsClient.send(
+    const result = await snsClient.send(
       new PublishCommand({
         Message: message,
         PhoneNumber: phoneNumber
@@ -26,8 +26,12 @@ export async function sendSMSNotification({
     );
 
     await markNotificationAsSent(notificationId);
+
+    console.log(
+      `SMS sent successfully for notification ${notificationId}, Message ID: ${result.MessageId}`
+    );
   } catch (error) {
-    console.error('Error sending SMS notification:', error);
+    console.error(`Failed to send SMS for notification ${notificationId}:`, error);
 
     await markNotificationAsFailed(notificationId);
   }
