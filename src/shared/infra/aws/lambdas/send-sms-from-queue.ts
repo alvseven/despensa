@@ -47,6 +47,8 @@ export const handler = async (event: SQSEvent) => {
 
       const daysToExpire = differenceInCalendarDays(new Date(product.expiresAt), new Date());
 
+      // TODO: we should sent all notifications in one message, cause if there's three products, there would be three messages sent
+
       const message = `Despensa: Olá, ${user.name}, seu produto ${product.name} irá vencer em ${daysToExpire} dias!`;
 
       await sendSMSNotification({

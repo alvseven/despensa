@@ -10,6 +10,7 @@ import { mailer } from '@/shared/infra/mailer/index.ts';
 import { TZDate } from '@date-fns/tz';
 import { render } from '@react-email/components';
 import { addMinutes } from 'date-fns';
+import { TIME_ZONE } from '@/shared/constants/time-zone.ts';
 
 export async function sendEmailVerificationCode({ name, email }: SendEmailVerificationCodeInput) {
   const { createValidation, getValidationByIdentifier, setValidationCodeAsExpired } =
@@ -22,7 +23,7 @@ export async function sendEmailVerificationCode({ name, email }: SendEmailVerifi
   }
 
   const otp = generateOTPCode();
-  const timezoneDate = new TZDate(new Date());
+  const timezoneDate = new TZDate(new Date(), TIME_ZONE);
 
   await createValidation({
     code: otp,
