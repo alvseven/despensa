@@ -1,0 +1,11 @@
+{
+  "name": "despensa-deps-layer",
+  "version": "1.0.0",
+  "dependencies": {
+    "drizzle-orm": "^0.39.3",
+    "pg": "^8.14.0",
+    "date-fns": "^4.1.0",
+    "zod": "^3.24.2",
+    "dotenv": "^16.4.7"
+  }
+}

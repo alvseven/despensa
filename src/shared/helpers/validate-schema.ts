@@ -7,7 +7,7 @@ export const validateSchema = <Schema extends ZodSchema>(
   schema: Schema,
   data: Record<keyof z.infer<Schema>, unknown>,
   fields: Array<keyof z.infer<Schema>> = []
-): [null, { data: z.infer<Schema> }] | [{ message: any; code: ErrorStatusCode }, null] => {
+): [null, { data: z.infer<Schema> }] | [{ message: string[]; code: ErrorStatusCode }, null] => {
   const result = schema.safeParse(data, {
     errorMap: zodCustomErrorMap(fields)
   });
@@ -15,7 +15,11 @@ export const validateSchema = <Schema extends ZodSchema>(
   if (result.error) {
     return [
       {
-        message: Object.values(result.error.flatten().fieldErrors).flat(),
+        message: Object.values(result.error.flatten().fieldErrors)
+          .flat()
+          .filter((value): value is Exclude<typeof value, false | null | undefined | '' | 0> =>
+            Boolean(value)
+          ),
         code: STATUS_CODES.BAD_REQUEST
       },
       null

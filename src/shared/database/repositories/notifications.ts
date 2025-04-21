@@ -1,4 +1,5 @@
-import { eq } from 'drizzle-orm';
+import { format } from 'date-fns';
+import { and, eq } from 'drizzle-orm';
 import { db } from '../index.ts';
 import { type Notification, notifications } from '../schemas/notifications.ts';
 
@@ -9,6 +10,12 @@ export const notificationsRepository = () => {
     const [notificationCreated] = await db.insert(notifications).values(notification).returning();
 
     return notificationCreated;
+  };
+
+  const getNotificationById = async (id: Notification['id']) => {
+    const [notification] = await db.select().from(notifications).where(eq(notifications.id, id));
+
+    return notification;
   };
 
   const updateNotificationById = async (
@@ -26,10 +33,13 @@ export const notificationsRepository = () => {
   };
 
   const getPendingNotifications = async () => {
+    const today = new Date();
+    const formattedDate = format(today, 'yyyy-MM-dd');
+
     return await db
       .select()
       .from(notifications)
-      .where(eq(notifications.status, 'created'))
+      .where(and(eq(notifications.status, 'created'), eq(notifications.notifyAt, formattedDate)))
       .execute();
   };
 
@@ -65,6 +75,7 @@ export const notificationsRepository = () => {
 
   return {
     createNotification,
+    getNotificationById,
     updateNotificationById,
     getPendingNotifications,
     scheduleNotification,

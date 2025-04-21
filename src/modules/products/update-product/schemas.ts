@@ -1,3 +1,4 @@
+import { SAO_PAULO_TIME_ZONE } from '@/shared/constants/time-zone.ts';
 import { TZDate } from '@date-fns/tz';
 import { isAfter, isBefore, isMatch } from 'date-fns';
 import { z } from 'zod';
@@ -15,7 +16,8 @@ export const updateProductByIdRequestSchema = z.object({
         message: 'Invalid date format. Please use YYYY-MM-DD format.'
       });
     }
-    const currentDate = new TZDate(new Date(), 'America/Sao_Paulo');
+
+    const currentDate = new TZDate(new Date(), SAO_PAULO_TIME_ZONE);
     const parsedDate = new Date(date);
 
     const isAfterCurrentDate = isAfter(parsedDate, currentDate);
@@ -36,7 +38,7 @@ export const updateProductByIdRequestSchema = z.object({
       });
     }
 
-    const currentDate = new TZDate(new Date(), 'America/Sao_Paulo');
+    const currentDate = new TZDate(new Date(), SAO_PAULO_TIME_ZONE);
     const parsedDate = new Date(date);
 
     if (isBefore(parsedDate, currentDate)) {

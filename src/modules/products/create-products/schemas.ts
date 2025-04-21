@@ -1,6 +1,7 @@
+import { SAO_PAULO_TIME_ZONE } from '@/shared/constants/time-zone.ts';
 import { TZDate } from '@date-fns/tz';
-import { format, isAfter, isBefore, isMatch, parse } from 'date-fns';
-import { isValid, z } from 'zod';
+import { isAfter, isBefore, isMatch } from 'date-fns';
+import { z } from 'zod';
 
 const dateFormat = 'yyyy-MM-dd';
 
@@ -15,7 +16,7 @@ export const createProductRequestSchema = z.object({
       });
     }
 
-    const currentDate = new TZDate(new Date(), 'America/Sao_Paulo');
+    const currentDate = new TZDate(new Date(), SAO_PAULO_TIME_ZONE);
     const parsedDate = new Date(date);
 
     const isAfterCurrentDate = isAfter(parsedDate, currentDate);
@@ -37,7 +38,7 @@ export const createProductRequestSchema = z.object({
       });
     }
 
-    const currentDate = new TZDate(new Date(), 'America/Sao_Paulo');
+    const currentDate = new TZDate(new Date(), SAO_PAULO_TIME_ZONE);
     const parsedDate = new Date(date);
 
     if (isBefore(parsedDate, currentDate)) {
