@@ -1,7 +1,7 @@
 import { SAO_PAULO_TIME_ZONE } from '@/shared/constants/time-zone.ts';
 import { TZDate } from '@date-fns/tz';
-import {  isAfter, isBefore, isMatch } from 'date-fns';
-import {  z } from 'zod';
+import { isAfter, isBefore, isMatch } from 'date-fns';
+import { z } from 'zod';
 
 const dateFormat = 'yyyy-MM-dd';
 

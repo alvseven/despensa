@@ -16,7 +16,7 @@ export const updateProductByIdRequestSchema = z.object({
         message: 'Invalid date format. Please use YYYY-MM-DD format.'
       });
     }
-    
+
     const currentDate = new TZDate(new Date(), SAO_PAULO_TIME_ZONE);
     const parsedDate = new Date(date);
 
