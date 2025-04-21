@@ -17,6 +17,10 @@ export async function authenticateUser({ password, email }: AuthenticateUserInpu
     return errorResponse('Invalid credentials', STATUS_CODES.UNAUTHORIZED);
   }
 
+  if (!userFound.password) {
+    return errorResponse('Invalid credentials', STATUS_CODES.UNAUTHORIZED);
+  }
+
   const passwordsMatch = await bcrypt.compare(password, userFound.password);
 
   if (!passwordsMatch) {
