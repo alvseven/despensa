@@ -7,6 +7,9 @@
       "recommended": true,
       "suspicious": {
         "noExplicitAny": "error"
+      },
+      "correctness": {
+        "noUnusedVariables": "error"
       }
     }
   },
