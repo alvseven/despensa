@@ -4,13 +4,11 @@ import { z } from 'zod';
 
 const dateFormat = 'yyyy-MM-dd';
 
-
 export const updateProductByIdRequestSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
   name: z.string().min(1).optional(),
   buyedAt: z.string().superRefine((date, ctx) => {
-
     if (!isMatch(date, dateFormat)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
