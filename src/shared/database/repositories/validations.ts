@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-import { TIME_ZONE } from '@/shared/constants/time-zone.ts';
+import { SAO_PAULO_TIME_ZONE } from '@/shared/constants/time-zone.ts';
 import { TZDate } from '@date-fns/tz';
 import { db } from '../index.ts';
 import type * as schema from '../schemas/index.ts';
@@ -29,13 +29,13 @@ export const validationRepository = () => {
     code: Validation['code'],
     tx: NodePgDatabase<typeof schema> = db
   ) => {
-    const usedAtDate = new TZDate(new Date(), TIME_ZONE);
+    const usedAtDate = new TZDate(new Date(), SAO_PAULO_TIME_ZONE);
 
     await tx.update(validations).set({ usedAt: usedAtDate }).where(eq(validations.code, code));
   };
 
   const setValidationCodeAsExpired = async (code: Validation['code']) => {
-    const expiresAtDate = new TZDate(new Date(), TIME_ZONE);
+    const expiresAtDate = new TZDate(new Date(), SAO_PAULO_TIME_ZONE);
 
     await db
       .update(validations)

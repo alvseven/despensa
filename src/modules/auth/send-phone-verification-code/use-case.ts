@@ -1,8 +1,7 @@
-import { sendSMSNotification } from '@/modules/notifications/send-sms-notification/use-case.ts';
 import type { SendPhoneVerificationCodeInput } from './schemas.ts';
 
 import { envs } from '@/shared/config/env.ts';
-import { TIME_ZONE } from '@/shared/constants/time-zone.ts';
+import { SAO_PAULO_TIME_ZONE } from '@/shared/constants/time-zone.ts';
 import { validationRepository } from '@/shared/database/repositories/validations.ts';
 import { generateOTPCode } from '@/shared/helpers/generate-otp-code.ts';
 import { snsClient } from '@/shared/infra/aws/sns-client.ts';
@@ -17,7 +16,7 @@ export async function sendPhoneVerificationCode({ phoneNumber }: SendPhoneVerifi
     validationRepository();
 
   const otp = generateOTPCode();
-  const timezoneDate = new TZDate(new Date(), TIME_ZONE);
+  const timezoneDate = new TZDate(new Date(), SAO_PAULO_TIME_ZONE);
 
   const validationAlreadyExists = await getValidationByIdentifier(phoneNumber);
 

@@ -1,1 +1,1 @@
-export const TIME_ZONE = 'America/Sao_Paulo';
+export const SAO_PAULO_TIME_ZONE = 'America/Sao_Paulo';
