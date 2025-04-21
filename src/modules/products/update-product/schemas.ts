@@ -6,35 +6,31 @@ export const updateProductByIdRequestSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
   name: z.string().min(1).optional(),
-  buyedAt: z.string().refine(
-    (date) => {
-      const currentDate = new TZDate(new Date(), 'America/Sao_Paulo');
-      const parsedDate = new Date(date);
+  buyedAt: z.string().superRefine((date, ctx) => {
+    const currentDate = new TZDate(new Date(), 'America/Sao_Paulo');
+    const parsedDate = new Date(date);
 
-      const isAfterCurrentDate = isAfter(parsedDate, currentDate);
+    const isAfterCurrentDate = isAfter(parsedDate, currentDate);
 
-      if (isAfterCurrentDate) return false;
-
-      return true;
-    },
-    {
-      message: 'Invalid date format. Please use YYYY-MM-DD format.'
+    if (isAfterCurrentDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Invalid date format. Please use YYYY-MM-DD format.'
+      });
     }
-  ),
+  }),
   category: z.string(),
-  expiresAt: z.string().refine(
-    (date) => {
-      const currentDate = new TZDate(new Date(), 'America/Sao_Paulo');
-      const parsedDate = new Date(date);
+  expiresAt: z.string().superRefine((date, ctx) => {
+    const currentDate = new TZDate(new Date(), 'America/Sao_Paulo');
+    const parsedDate = new Date(date);
 
-      if (isBefore(parsedDate, currentDate)) return false;
-
-      return true;
-    },
-    {
-      message: 'Invalid date format. Please use YYYY-MM-DD format.'
+    if (isBefore(parsedDate, currentDate)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Invalid date format. Please use YYYY-MM-DD format.'
+      });
     }
-  )
+  })
 });
 
 export type UpdateProductByIdInput = z.infer<typeof updateProductByIdRequestSchema>;

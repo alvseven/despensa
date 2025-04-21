@@ -24,7 +24,7 @@ productsRoutes.post('', verifyJwt, async (c) => {
   const [schemaError, parsedSchema] = validateSchema(createProductRequestSchema, {
     ...body,
     userId
-  });
+  }, ['buyedAt', 'expiresAt']);
 
   if (schemaError) {
     return c.json({ message: schemaError.message }, schemaError.code);
@@ -78,11 +78,15 @@ productsRoutes.patch('/:id', verifyJwt, async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json();
 
-  const [schemaError, parsedSchema] = validateSchema(updateProductByIdRequestSchema, {
-    ...body,
-    id,
-    userId
-  });
+  const [schemaError, parsedSchema] = validateSchema(
+    updateProductByIdRequestSchema,
+    {
+      ...body,
+      id,
+      userId
+    },
+    ['buyedAt', 'expiresAt']
+  );
 
   if (schemaError) {
     return c.json({ message: schemaError.message }, schemaError.code);
