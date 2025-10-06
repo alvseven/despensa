@@ -45,8 +45,8 @@ importers:
         specifier: ^8.14.0
         version: 8.14.1
       resend:
-        specifier: ^4.3.0
-        version: 4.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^6.1.2
+        version: 6.1.2(@react-email/render@1.0.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       tsup:
         specifier: ^8.3.6
         version: 8.4.0(tsx@4.19.3)(typescript@5.8.3)
@@ -1791,9 +1791,14 @@ packages:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
     engines: {node: '>= 14.18.0'}
 
-  resend@4.3.0:
-    resolution: {integrity: sha512-4OBHeusMVSl0vcba2J3AaGzdZ1SXAAhX/Wkcwobe16AHmlW9h3li8wG62Fhvlsc61e+wlQoxcwJZP6WrBTbghQ==}
+  resend@6.1.2:
+    resolution: {integrity: sha512-C9Q+YkRe57P8MQlkHG3yatSR/B6sqBGA06Ri2DveJfkz9Vm16182FC/iHB0K6IAfmqZ4yRrFebFw1EPuktLtSg==}
     engines: {node: '>=18'}
+    peerDependencies:
+      '@react-email/render': '*'
+    peerDependenciesMeta:
+      '@react-email/render':
+        optional: true
 
   resolve-from@5.0.0:
     resolution: {integrity: sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==}
@@ -1855,6 +1860,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
@@ -3758,12 +3764,9 @@ snapshots:
 
   readdirp@4.1.2: {}
 
-  resend@4.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
-    dependencies:
+  resend@6.1.2(@react-email/render@1.0.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)):
+    optionalDependencies:
       '@react-email/render': 1.0.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-    transitivePeerDependencies:
-      - react
-      - react-dom
 
   resolve-from@5.0.0: {}
 
