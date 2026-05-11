@@ -1,45 +1,20 @@
 {
   "name": "despensa",
-  "type": "module",
-  "packageManager": "pnpm@10.7.0",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*", "infra"],
   "scripts": {
-    "build": "tsup src",
-    "dev": "NODE_OPTIONS=\"--import=tsconfig-paths/register.js\" tsx watch src/shared/app.ts",
-    "db:generate": "pnpm drizzle-kit generate --name",
-    "db:migrate": "pnpm drizzle-kit migrate",
-    "db:studio": "pnpm drizzle-kit studio",
+    "build": "turbo build",
+    "dev": "turbo dev",
     "lint": "biome check .",
-    "lint:ci": "biome ci .",
     "lint:fix": "biome check --write --unsafe .",
-    "types:ci": "tsc --noEmit",
-    "lambdas:build-and-zip": "tsx build-lambdas.ts"
-  },
-  "dependencies": {
-    "@aws-sdk/client-sns": "^3.787.0",
-    "@aws-sdk/client-sqs": "^3.787.0",
-    "@date-fns/tz": "^1.2.0",
-    "@hono/node-server": "^1.13.8",
-    "@react-email/components": "^0.0.36",
-    "aws-lambda": "^1.0.7",
-    "bcryptjs": "^3.0.2",
-    "date-fns": "^4.1.0",
-    "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.39.3",
-    "hono": "^4.7.2",
-    "pg": "^8.14.0",
-    "resend": "^4.3.0",
-    "tsup": "^8.3.6",
-    "zod": "^3.24.2"
+    "test": "turbo test",
+    "types": "turbo types"
   },
   "devDependencies": {
     "@arthurfiorette/biomejs-config": "^1.0.7",
     "@biomejs/biome": "^1.9.4",
-    "@types/aws-lambda": "^8.10.149",
-    "@types/node": "^22.14.1",
-    "@types/pg": "^8.11.11",
-    "drizzle-kit": "^0.30.4",
-    "tsconfig-paths": "^4.2.0",
-    "tsx": "^4.19.3",
+    "turbo": "^2.3.3",
     "typescript": "^5.7.3"
-  }
+  },
+  "packageManager": "bun@1.1.34"
 }

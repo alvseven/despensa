@@ -8,11 +8,17 @@ node_modules/
 
 # env
 .env
+.env.local
 
+# build outputs
+dist/
+.next/
+.turbo/
 
 # logs
 logs/
 *.log
-pnpm-debug.log*
 
-
+# lambda artifacts (will be removed in trigger.dev migration)
+apps/api/aws/lambdas/*.cjs
+apps/api/aws/lambdas/zips/

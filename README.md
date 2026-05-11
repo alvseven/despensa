@@ -1,14 +1,37 @@
-# Despensa 
+# Despensa
 
-Despensa is a backend service for tracking food products, managing expiration dates, and sending timely SMS notifications to help reduce food waste. It’s designed to make household or small-scale inventory management more efficient and sustainable
+Track your pantry. Get notified before things expire.
 
-## Stack
+## Repo layout
 
-- Node.js
-- TypeScript	
-- Hono	
-- Drizzle ORM	
-- PostgreSQL
-- AWS SNS
-- Docker
-- Resend
+```
+apps/
+  api/   -> backend (Hono + Drizzle + Postgres) — api.despensa.com
+  app/   -> product webapp (Next.js)            — app.despensa.com
+  www/   -> marketing site (Next.js)            — despensa.com
+packages/
+  (shared code — empty for now)
+```
+
+## Requirements
+
+- [Bun](https://bun.sh) 1.1+
+- Docker (for local Postgres)
+
+## Setup
+
+```bash
+bun install
+cp apps/api/.env.example apps/api/.env   # then fill in values
+docker compose up -d database              # local Postgres
+bun --filter @despensa/api db:migrate
+bun dev                                    # runs all apps via turborepo
+```
+
+## Per-app dev
+
+```bash
+bun --filter @despensa/api dev   # backend on :3333
+bun --filter @despensa/app dev   # webapp  on :3000
+bun --filter @despensa/www dev   # marketing on :3001
+```

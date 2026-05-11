@@ -1,0 +1,6 @@
+config:
+  despensa-infra:env: dev
+  despensa-infra:domain: api.despensa.com
+  # Secrets — set with: pulumi config set --secret <key> <value>
+  # cloudflare:apiToken
+  # aws:region

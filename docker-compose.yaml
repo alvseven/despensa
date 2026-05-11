@@ -1,43 +1,17 @@
 version: "3.8"
 
 services:
-
-  base-api: &base-api
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./src:/app/src
-      - ./drizzle:/app/drizzle
-      - ./drizzle.config.ts:/app/drizzle.config.ts
-      - ./package.json:/app/package.json
-      - ./pnpm-lock.yaml:/app/pnpm-lock.yaml
-      - ./tsconfig.json:/app/tsconfig.json
-
-  api:
-    container_name: api
-    <<: *base-api
-    ports:
-      - "3333:3333"
-    env_file:
-      - ./.env
-    command: ["sh","-c", "pnpm dev"]
-    depends_on:
-      database:
-        condition: service_healthy
-    restart: always
-
   database:
-    container_name: postgres
+    container_name: despensa-postgres
     image: postgres:17
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
     env_file:
-      - ./.env
+      - ./apps/api/.env
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 10s
       retries: 10
