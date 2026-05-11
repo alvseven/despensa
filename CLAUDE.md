@@ -256,6 +256,4 @@ Run: `bun --filter @despensa/api test`. Requires Docker running locally.
 - Bun loads `.env` automatically for both scripts and child processes (drizzle-kit, etc). No `dotenv` import needed.
 - Hono's `verify` from `hono/jwt` requires the algorithm as a third argument now — but we don't use it anymore (Clerk handles JWT verification).
 - The `users` table is **denormalized** with Clerk-managed fields (email, name, avatarUrl). They're kept in sync via the `user.updated` webhook. Treat Clerk as the source of truth; our DB is the lookup index.
-- Migrations 4 and 5 are destructive in different ways:
-  - Migration 4 (`add-accounts-and-memberships`) backfills accounts/memberships from existing users.
-  - Migration 5 (`clerk-auth-migration`) **truncates all data** because pre-Clerk users have no `clerk_id` to backfill. Acceptable while pre-production.
+- Schema starts from a single init migration (`20260511000000_init.sql`). Pre-monorepo migration history was squashed since nothing was in production yet — `bun --filter @despensa/api db:migrate` against a fresh database creates the whole schema in one shot.

@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1740097405831,
-      "tag": "20250221002325_create_table_users_and_products",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1741903740037,
-      "tag": "20250313220900_create-users-and-products-relations",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1744839367784,
-      "tag": "20250416213607_create-table-notifications",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1744843388698,
-      "tag": "20250416224308_add_validation_db_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1778587200000,
-      "tag": "20260511120000_add-accounts-and-memberships",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1778590800000,
-      "tag": "20260511130000_clerk-auth-migration",
+      "when": 1778544000000,
+      "tag": "20260511000000_init",
       "breakpoints": true
     }
   ]

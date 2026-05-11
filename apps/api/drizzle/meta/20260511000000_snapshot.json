@@ -1,6 +1,6 @@
 {
-  "id": "5a99fdad-13e5-490c-b3d8-84b41faad281",
-  "prevId": "4d99fdad-13e5-490c-b3d8-84b41faad280",
+  "id": "00000000-0000-0000-0000-000000000001",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -14,19 +14,11 @@
           "primaryKey": true,
           "notNull": true
         },
-        "is_phone_verified": {
-          "name": "is_phone_verified",
-          "type": "boolean",
+        "clerk_id": {
+          "name": "clerk_id",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "is_email_verified": {
-          "name": "is_email_verified",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -36,18 +28,6 @@
         },
         "email": {
           "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "phone_number": {
-          "name": "phone_number",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -83,15 +63,15 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "users_clerk_id_unique": {
+          "name": "users_clerk_id_unique",
+          "nullsNotDistinct": false,
+          "columns": ["clerk_id"]
+        },
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
           "columns": ["email"]
-        },
-        "users_phone_number_unique": {
-          "name": "users_phone_number_unique",
-          "nullsNotDistinct": false,
-          "columns": ["phone_number"]
         }
       },
       "policies": {},
@@ -378,63 +358,6 @@
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
-    },
-    "public.validations": {
-      "name": "validations",
-      "schema": "",
-      "columns": {
-        "code": {
-          "name": "code",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "type": {
-          "name": "type",
-          "type": "validation_types",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "identifier": {
-          "name": "identifier",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "used_at": {
-          "name": "used_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "validations_identifier_unique": {
-          "name": "validations_identifier_unique",
-          "nullsNotDistinct": false,
-          "columns": ["identifier"]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
     }
   },
   "enums": {
@@ -452,11 +375,6 @@
       "name": "notification_status",
       "schema": "public",
       "values": ["created", "scheduled", "sent", "failed"]
-    },
-    "public.validation_types": {
-      "name": "validation_types",
-      "schema": "public",
-      "values": ["phone", "email"]
     }
   },
   "schemas": {},
