@@ -13,6 +13,7 @@ import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testconta
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
+import { Wait } from 'testcontainers';
 
 mock.module('@clerk/backend', () => ({
   verifyToken: async (token: string) => {
@@ -35,7 +36,9 @@ let pool: Pool | null = null;
 
 export async function setupTestDatabase() {
   if (container) return;
-  container = await new PostgreSqlContainer('postgres:17').start();
+  container = await new PostgreSqlContainer('postgres:17')
+    .withWaitStrategy(Wait.forListeningPorts())
+    .start();
   const url = container.getConnectionUri();
   process.env.DATABASE_URL = url;
   process.env.DRIZZLE_KIT_DATABASE_URL = url;
@@ -65,4 +68,9 @@ export async function resetDb() {
   );
 }
 
-await setupTestDatabase();
+try {
+  await setupTestDatabase();
+} catch (err) {
+  console.error('test database setup failed:', err);
+  process.exit(1);
+}
