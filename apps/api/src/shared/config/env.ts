@@ -4,7 +4,7 @@ const envsSchema = z.object({
   API_PORT: z.coerce.number(),
   NODE_ENV: z.enum(['development', 'production', 'test']),
 
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   SENTRY_DSN: z.string().optional(),
 
   DATABASE_URL: z.string(),

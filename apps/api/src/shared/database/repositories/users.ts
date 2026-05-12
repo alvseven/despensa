@@ -16,12 +16,18 @@ export const usersRepository = (tx: Tx = db) => {
   };
 
   const getUserById = async (id: User['id']) => {
-    const [userFound] = await tx.select().from(users).where(eq(users.id, id));
+    const [userFound] = await tx
+      .select()
+      .from(users)
+      .where(and(eq(users.id, id), isNull(users.deletedAt)));
     return userFound;
   };
 
   const getUserByClerkId = async (clerkId: User['clerkId']) => {
-    const [userFound] = await tx.select().from(users).where(eq(users.clerkId, clerkId));
+    const [userFound] = await tx
+      .select()
+      .from(users)
+      .where(and(eq(users.clerkId, clerkId), isNull(users.deletedAt)));
     return userFound;
   };
 
@@ -32,7 +38,7 @@ export const usersRepository = (tx: Tx = db) => {
     const [updated] = await tx
       .update(users)
       .set({ ...patch, updatedAt: new Date() })
-      .where(eq(users.clerkId, clerkId))
+      .where(and(eq(users.clerkId, clerkId), isNull(users.deletedAt)))
       .returning();
     return updated;
   };

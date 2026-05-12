@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { db } from '../index.ts';
@@ -15,7 +15,10 @@ export const accountsRepository = (tx: Tx = db) => {
   };
 
   const getAccountById = async (id: Account['id']) => {
-    const [account] = await tx.select().from(accounts).where(eq(accounts.id, id));
+    const [account] = await tx
+      .select()
+      .from(accounts)
+      .where(and(eq(accounts.id, id), isNull(accounts.deletedAt)));
 
     return account;
   };

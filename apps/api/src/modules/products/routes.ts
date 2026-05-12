@@ -14,6 +14,7 @@ import { updateProductById } from './update-product/use-case.ts';
 import { type AppVariables, requireAuth } from '../auth/middlewares/require-auth.ts';
 
 import { validateSchema } from '@/shared/helpers/validate-schema.ts';
+import { respond } from '@/shared/infra/http/api-response.ts';
 
 export const productsRoutes = new Hono<{ Variables: AppVariables }>();
 
@@ -23,55 +24,29 @@ productsRoutes.post('', async (c) => {
   const { accountId } = c.get('auth');
   const body = await c.req.json();
 
-  const [schemaError, parsedSchema] = validateSchema(
-    createProductRequestSchema,
-    { ...body, accountId },
-    ['buyedAt', 'expiresAt']
-  );
+  const data = validateSchema(createProductRequestSchema, { ...body, accountId }, [
+    'buyedAt',
+    'expiresAt'
+  ]);
 
-  if (schemaError) {
-    return c.json({ message: schemaError.message }, schemaError.code);
-  }
-
-  const [_error, response] = await createProduct(parsedSchema.data);
-
-  return c.json(response.data, response.code);
+  return respond(c, await createProduct(data));
 });
 
 productsRoutes.get('/', async (c) => {
   const { accountId } = c.get('auth');
 
-  const [schemaError, parsedSchema] = validateSchema(getProductsRequestSchema, { accountId });
+  const data = validateSchema(getProductsRequestSchema, { accountId });
 
-  if (schemaError) {
-    return c.json({ message: schemaError.message }, schemaError.code);
-  }
-
-  const [_, response] = await getProducts(parsedSchema.data);
-
-  return c.json(response.data, response.code);
+  return respond(c, await getProducts(data));
 });
 
 productsRoutes.get('/:id', async (c) => {
   const { accountId } = c.get('auth');
   const id = c.req.param('id');
 
-  const [schemaError, parsedSchema] = validateSchema(getProductByIdRequestSchema, {
-    accountId,
-    id
-  });
+  const data = validateSchema(getProductByIdRequestSchema, { accountId, id });
 
-  if (schemaError) {
-    return c.json({ message: schemaError.message }, schemaError.code);
-  }
-
-  const [error, response] = await getProduct(parsedSchema.data);
-
-  if (error) {
-    return c.json({ message: error.message }, error.code);
-  }
-
-  return c.json(response.data, response.code);
+  return respond(c, await getProduct(data));
 });
 
 productsRoutes.patch('/:id', async (c) => {
@@ -79,38 +54,20 @@ productsRoutes.patch('/:id', async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json();
 
-  const [schemaError, parsedSchema] = validateSchema(
-    updateProductByIdRequestSchema,
-    { ...body, id, accountId },
-    ['buyedAt', 'expiresAt']
-  );
+  const data = validateSchema(updateProductByIdRequestSchema, { ...body, id, accountId }, [
+    'buyedAt',
+    'expiresAt'
+  ]);
 
-  if (schemaError) {
-    return c.json({ message: schemaError.message }, schemaError.code);
-  }
-
-  const [error, response] = await updateProductById(parsedSchema.data);
-
-  if (error) {
-    return c.json({ message: error.message }, error.code);
-  }
-
-  return c.json(response.data, response.code);
+  return respond(c, await updateProductById(data));
 });
 
 productsRoutes.delete('/:id', async (c) => {
   const { accountId } = c.get('auth');
   const id = c.req.param('id');
 
-  const [schemaError, parsedSchema] = validateSchema(deleteProductRequestSchema, {
-    id,
-    accountId
-  });
+  const data = validateSchema(deleteProductRequestSchema, { id, accountId });
 
-  if (schemaError) {
-    return c.json({ message: schemaError.message }, schemaError.code);
-  }
-
-  await deleteProduct(parsedSchema.data);
+  await deleteProduct(data);
   return c.body(null, 204);
 });

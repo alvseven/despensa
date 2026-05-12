@@ -51,8 +51,11 @@ app.use(async (c, next) => {
 
 app.get('/health', (c) => c.json({ status: 'ok' }));
 
-app.route('/users', usersRoutes);
-app.route('/products', productsRoutes);
+const v1 = new Hono<{ Variables: AppVariables }>();
+v1.route('/users', usersRoutes);
+v1.route('/products', productsRoutes);
+
+app.route('/v1', v1);
 app.route('/webhooks/clerk', clerkWebhooksRoutes);
 
 app.onError(globalErrorHandler);

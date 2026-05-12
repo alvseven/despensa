@@ -1,3 +1,6 @@
+import type { Context } from 'hono';
+import type { ContentfulStatusCode } from 'hono/utils/http-status';
+
 import type { ErrorStatusCode, SuccessStatusCode } from './status-code.ts';
 
 type ErrorResult<Code extends ErrorStatusCode> = [
@@ -18,6 +21,10 @@ type SuccessResult<
     data: T;
   }
 ];
+
+export type UseCaseResult<T extends Record<string, unknown> | boolean | unknown[]> =
+  | ErrorResult<ErrorStatusCode>
+  | SuccessResult<T, SuccessStatusCode>;
 
 export const successResponse = <
   T extends Record<string, unknown> | boolean | unknown[],
@@ -40,4 +47,15 @@ export const errorResponse = <Code extends ErrorStatusCode>(
   code: Code
 ): ErrorResult<Code> => {
   return [{ message, code }, null];
+};
+
+export const respond = <T extends Record<string, unknown> | boolean | unknown[]>(
+  c: Context,
+  result: UseCaseResult<T>
+) => {
+  const [error, response] = result;
+  
+  if (error) return c.json({ message: error.message }, error.code);
+
+  return c.json(response.data, response.code as ContentfulStatusCode);
 };

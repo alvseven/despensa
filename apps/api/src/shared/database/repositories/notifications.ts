@@ -5,14 +5,13 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { db } from '../index.ts';
 import type * as schema from '../schemas/index.ts';
 import { type Notification, notifications } from '../schemas/notifications.ts';
-import { type Product, products } from '../schemas/products.ts';
+import { products } from '../schemas/products.ts';
 
 type Tx = NodePgDatabase<typeof schema>;
 type NotificationInsert = Pick<Notification, 'notifyAt' | 'productId' | 'accountId'>;
 
 export const notificationsRepository = (tx: Tx = db) => {
   const createMany = async (rows: NotificationInsert[]) => {
-    if (rows.length === 0) return [];
     return await tx.insert(notifications).values(rows).returning();
   };
 
@@ -27,8 +26,7 @@ export const notificationsRepository = (tx: Tx = db) => {
   const getWithProductsForAccount = async (
     ids: Notification['id'][],
     accountId: Notification['accountId']
-  ): Promise<Array<{ notification: Notification; product: Product }>> => {
-    if (ids.length === 0) return [];
+  ) => {
     return await tx
       .select({ notification: notifications, product: products })
       .from(notifications)
@@ -37,7 +35,6 @@ export const notificationsRepository = (tx: Tx = db) => {
   };
 
   const markManyAs = async (status: Notification['status'], ids: Notification['id'][]) => {
-    if (ids.length === 0) return;
     await tx.update(notifications).set({ status }).where(inArray(notifications.id, ids));
   };
 

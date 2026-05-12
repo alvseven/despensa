@@ -41,7 +41,7 @@ export const requireAuth = createMiddleware<{ Variables: AppVariables }>(async (
 
     const user = await usersRepository().getUserByClerkId(clerkId);
 
-    if (!user || user.deletedAt) {
+    if (!user) {
       return c.json({ message: 'User not provisioned' }, STATUS_CODES.UNAUTHORIZED);
     }
 

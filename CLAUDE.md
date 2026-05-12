@@ -201,7 +201,15 @@ Tests use `bun test` with `@testcontainers/postgresql`.
 - Each test file uses `beforeEach(() => resetDb())` to truncate all tables.
 - Tests hit the actual `app` via `app.request(path, init)` — no separate HTTP server needed.
 
-Run: `bun --filter @despensa/api test`. Requires Docker running locally.
+Run: `bun --filter @despensa/api test`. Requires Docker (or Podman) running locally.
+
+With Podman on macOS, export these once (e.g. in `~/.zshrc`) so testcontainers can find the socket:
+
+```bash
+export DOCKER_HOST="unix://$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
+export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+export TESTCONTAINERS_RYUK_DISABLED=true
+```
 
 ## Database migrations
 

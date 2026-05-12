@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 import { db } from '@/shared/database/index.ts';
 import { usersRepository } from '@/shared/database/repositories/users.ts';
@@ -12,7 +12,7 @@ export async function getMe({ userId }: { userId: string }) {
 
   const user = await getUserById(userId);
 
-  if (!user || user.deletedAt) {
+  if (!user) {
     return errorResponse('User not found', STATUS_CODES.NOT_FOUND);
   }
 
@@ -25,7 +25,7 @@ export async function getMe({ userId }: { userId: string }) {
     })
     .from(memberships)
     .innerJoin(accounts, eq(memberships.accountId, accounts.id))
-    .where(eq(memberships.userId, userId));
+    .where(and(eq(memberships.userId, userId), isNull(accounts.deletedAt)));
 
   return successResponse(
     {

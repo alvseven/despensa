@@ -8,11 +8,11 @@ beforeEach(async () => {
   await resetDb();
 });
 
-describe('POST /products', () => {
+describe('POST /v1/products', () => {
   test('creates a product scoped to the caller account', async () => {
     const { token, account } = await createTestUser();
 
-    const res = await app.request('/products', {
+    const res = await app.request('/v1/products', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -34,14 +34,14 @@ describe('POST /products', () => {
   });
 
   test('rejects unauthenticated requests', async () => {
-    const res = await app.request('/products', { method: 'POST', body: '{}' });
+    const res = await app.request('/v1/products', { method: 'POST', body: '{}' });
     expect(res.status).toBe(401);
   });
 
   test('rejects invalid date format', async () => {
     const { token } = await createTestUser();
 
-    const res = await app.request('/products', {
+    const res = await app.request('/v1/products', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

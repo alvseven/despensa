@@ -8,11 +8,11 @@ beforeEach(async () => {
   await resetDb();
 });
 
-describe('GET /users/me', () => {
+describe('GET /v1/users/me', () => {
   test('returns the authenticated user with their accounts', async () => {
     const { user, account, token } = await createTestUser({ name: 'Ada' });
 
-    const res = await app.request('/users/me', {
+    const res = await app.request('/v1/users/me', {
       headers: { Authorization: `Bearer ${token}` }
     });
 
@@ -31,7 +31,7 @@ describe('GET /users/me', () => {
   });
 
   test('401 without a token', async () => {
-    const res = await app.request('/users/me');
+    const res = await app.request('/v1/users/me');
     expect(res.status).toBe(401);
   });
 });

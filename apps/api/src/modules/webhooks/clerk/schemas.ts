@@ -28,12 +28,3 @@ export const clerkEventSchema = z.discriminatedUnion('type', [
 export type ClerkUserData = z.infer<typeof clerkUserDataSchema>;
 export type ClerkUserDeletedData = z.infer<typeof clerkUserDeletedDataSchema>;
 export type ClerkEvent = z.infer<typeof clerkEventSchema>;
-
-export function resolvePrimaryEmail(data: ClerkUserData): string | null {
-  const primary = data.email_addresses.find((e) => e.id === data.primary_email_address_id);
-  return primary?.email_address ?? data.email_addresses[0]?.email_address ?? null;
-}
-
-export function resolveDisplayName(data: ClerkUserData): string {
-  return [data.first_name, data.last_name].filter(Boolean).join(' ').trim() || 'Anonymous';
-}

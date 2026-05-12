@@ -8,12 +8,12 @@ beforeEach(async () => {
   await resetDb();
 });
 
-describe('GET /products', () => {
+describe('GET /v1/products', () => {
   test('returns only the caller account products', async () => {
     const alice = await createTestUser({ name: 'Alice' });
     const bob = await createTestUser({ name: 'Bob' });
 
-    await app.request('/products', {
+    await app.request('/v1/products', {
       method: 'POST',
       headers: { Authorization: `Bearer ${alice.token}`, 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -25,7 +25,7 @@ describe('GET /products', () => {
       })
     });
 
-    await app.request('/products', {
+    await app.request('/v1/products', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bob.token}`, 'content-type': 'application/json' },
       body: JSON.stringify({
