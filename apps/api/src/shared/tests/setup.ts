@@ -13,6 +13,7 @@ import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testconta
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
+import { Wait } from 'testcontainers';
 
 mock.module('@clerk/backend', () => ({
   verifyToken: async (token: string) => {
@@ -45,19 +46,42 @@ export async function setupTestDatabase() {
   const log = (msg: string) => process.stderr.write(`[test-setup] ${msg}\n`);
 
   log('starting postgres testcontainer (this can take ~30s on first run while podman pulls the image)');
-  container = await new PostgreSqlContainer('postgres:17').start();
-  log(`container ready at ${container.getHost()}:${container.getPort()}`);
+  // Use the port wait only — podman's HEALTHCHECK reporting differs from
+  // docker's and the default forHealthCheck() can hang past withStartupTimeout.
+  // We confirm Postgres is actually accepting queries ourselves below.
+  container = await new PostgreSqlContainer('postgres:17')
+    .withWaitStrategy(Wait.forListeningPorts())
+    .start();
+  log(`container port mapped at ${container.getHost()}:${container.getPort()}`);
 
   const url = container.getConnectionUri();
   process.env.DATABASE_URL = url;
   process.env.DRIZZLE_KIT_DATABASE_URL = url;
 
-  pool = new Pool({ connectionString: url });
-  const migrationDb = drizzle(pool);
+  pool = new Pool({ connectionString: url, connectionTimeoutMillis: 1000 });
 
+  log('waiting for postgres to accept queries');
+  await waitForPostgres(pool);
+
+  const migrationDb = drizzle(pool);
   log('running migrations');
   await migrate(migrationDb, { migrationsFolder: './drizzle' });
   log('ready');
+}
+
+async function waitForPostgres(p: Pool, deadlineMs = 30_000, intervalMs = 250) {
+  const start = Date.now();
+  let lastErr: unknown;
+  while (Date.now() - start < deadlineMs) {
+    try {
+      await p.query('SELECT 1');
+      return;
+    } catch (err) {
+      lastErr = err;
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
+  }
+  throw new Error(`postgres not ready after ${deadlineMs}ms: ${String(lastErr)}`);
 }
 
 export async function teardownTestDatabase() {
