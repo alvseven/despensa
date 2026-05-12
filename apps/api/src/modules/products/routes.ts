@@ -32,7 +32,7 @@ productsRoutes.post('', async (c) => {
   return respond(c, await createProduct(data));
 });
 
-productsRoutes.get('/', async (c) => {
+productsRoutes.get('', async (c) => {
   const { accountId } = c.get('auth');
 
   const data = validateSchema(getProductsRequestSchema, { accountId });
