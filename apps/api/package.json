@@ -31,12 +31,10 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@testcontainers/postgresql": "^10.16.0",
     "@trigger.dev/build": "^3.3.0",
     "@types/bun": "^1.1.14",
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.4",
-    "testcontainers": "^10.16.0",
     "typescript": "^5.7.3"
   }
 }

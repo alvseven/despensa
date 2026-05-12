@@ -38,7 +38,7 @@ Frontends deploy via Vercel (config in `apps/<name>/vercel.json` when needed). B
 | Logs             | pino (pino-pretty in dev, JSON in prod)               |
 | Errors           | Hono `app.onError` → pino + `Sentry.captureException` |
 | Request tracing  | `x-request-id` middleware                             |
-| Testing          | bun:test + testcontainers Postgres                    |
+| Testing          | bun:test + dedicated Postgres on :5433 (compose)      |
 | Hosting (API)    | TBD                                                   |
 | Hosting (DB)     | TBD                                                   |
 | IaC              | Pulumi (TypeScript)                                   |
@@ -192,24 +192,23 @@ Deploy: `bun --filter @despensa/api trigger:deploy`.
 
 ## Testing
 
-Tests use `bun test` with `@testcontainers/postgresql`.
+Tests use `bun test` against a long-lived Postgres on `:5433` (the `test-database` service in `apps/api/compose.yaml`). We dropped testcontainers because its docker-socket discovery + ryuk sidecar are flaky under podman on macOS; a plain compose service is faster, deterministic, and works the same way under docker, podman, and GitHub Actions `services:`.
 
 - `apps/api/bunfig.toml` preloads `apps/api/src/shared/tests/setup.ts`.
-- `src/shared/tests/setup.ts` starts a container, sets env vars, runs Drizzle migrations, and mocks `@clerk/backend.verifyToken` so tests authenticate by sending `Authorization: Bearer test_<clerkId>`.
+- `src/shared/tests/setup.ts` connects to `TEST_DATABASE_URL` (defaults to `postgres://postgres:postgres@localhost:5433/despensa_test`), polls until pg accepts queries, runs Drizzle migrations, and mocks `@clerk/backend.verifyToken` so tests authenticate by sending `Authorization: Bearer test_<clerkId>`.
 - `src/shared/tests/factories.ts` exposes `createTestUser({ name?, email? })` which transactionally creates a user + personal account + owner membership and returns `{ user, account, token }`.
 - Tests live next to the code they cover: `use-case.test.ts` sits next to `use-case.ts`. Anything that can't be colocated (cross-cutting auth flow, etc.) goes under `src/shared/tests/`.
 - Each test file uses `beforeEach(() => resetDb())` to truncate all tables.
 - Tests hit the actual `app` via `app.request(path, init)` — no separate HTTP server needed.
 
-Run: `bun --filter @despensa/api test`. Requires Docker (or Podman) running locally.
-
-With Podman on macOS, export these once (e.g. in `~/.zshrc`) so testcontainers can find the socket:
+Run from `apps/api/`:
 
 ```bash
-export DOCKER_HOST="unix://$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
-export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
-export TESTCONTAINERS_RYUK_DISABLED=true
+podman-compose up -d test-database   # or `docker compose up -d test-database`
+bun test
 ```
+
+CI spins up the same Postgres as a service in `.github/workflows/ci.yaml`'s `test` job, so no setup is needed there.
 
 ## Database migrations
 
