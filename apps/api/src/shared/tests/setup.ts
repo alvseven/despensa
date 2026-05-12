@@ -13,7 +13,6 @@ import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testconta
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
-import { Wait } from 'testcontainers';
 
 mock.module('@clerk/backend', () => ({
   verifyToken: async (token: string) => {
@@ -43,16 +42,22 @@ let pool: Pool | null = null;
 
 export async function setupTestDatabase() {
   if (container) return;
-  container = await new PostgreSqlContainer('postgres:17')
-    .withWaitStrategy(Wait.forListeningPorts())
-    .start();
+  const log = (msg: string) => process.stderr.write(`[test-setup] ${msg}\n`);
+
+  log('starting postgres testcontainer (this can take ~30s on first run while podman pulls the image)');
+  container = await new PostgreSqlContainer('postgres:17').start();
+  log(`container ready at ${container.getHost()}:${container.getPort()}`);
+
   const url = container.getConnectionUri();
   process.env.DATABASE_URL = url;
   process.env.DRIZZLE_KIT_DATABASE_URL = url;
 
   pool = new Pool({ connectionString: url });
   const migrationDb = drizzle(pool);
+
+  log('running migrations');
   await migrate(migrationDb, { migrationsFolder: './drizzle' });
+  log('ready');
 }
 
 export async function teardownTestDatabase() {
