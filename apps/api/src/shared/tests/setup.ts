@@ -37,7 +37,9 @@ ensureEnv('NODE_ENV', 'test');
 ensureEnv('API_PORT', '0');
 ensureEnv('LOG_LEVEL', 'silent');
 ensureEnv('CLERK_SECRET_KEY', 'test_clerk_secret');
-ensureEnv('CLERK_WEBHOOK_SECRET', 'test_webhook_secret');
+// svix expects `whsec_<base64>` (matches Clerk's real format) — a raw string
+// trips the standardwebhooks Base64Coder.
+ensureEnv('CLERK_WEBHOOK_SECRET', 'whsec_dGVzdF93ZWJob29rX3NlY3JldF9wYWRkaW5nISE=');
 ensureEnv('RESEND_API_KEY', 'test_resend_key');
 process.env.DATABASE_URL = TEST_DATABASE_URL;
 process.env.DRIZZLE_KIT_DATABASE_URL = TEST_DATABASE_URL;

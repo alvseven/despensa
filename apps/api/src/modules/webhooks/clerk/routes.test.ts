@@ -15,7 +15,7 @@ beforeEach(async () => {
 
 // Must match the value setup.ts puts into process.env.CLERK_WEBHOOK_SECRET so
 // the route handler verifies against the same secret we sign with.
-const TEST_SECRET = process.env.CLERK_WEBHOOK_SECRET || 'test_webhook_secret';
+const TEST_SECRET = process.env.CLERK_WEBHOOK_SECRET as string;
 
 let svixId = 0;
 const signedRequest = (event: Record<string, unknown>) => {
