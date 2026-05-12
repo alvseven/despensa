@@ -1,14 +1,3 @@
-/**
- * Test preload — runs once per `bun test` invocation, before any test file loads.
- *
- * Connects to a dedicated test Postgres (port 5433 by default; see
- * `apps/api/compose.yaml`'s `test-database` service), runs Drizzle migrations
- * against it, and installs a stub for @clerk/backend so tests can authenticate
- * as any user by sending `Authorization: Bearer test_<clerkId>`.
- *
- * Each test file gets a clean DB via the `resetDb()` helper exported here.
- */
-
 import { afterAll, mock } from 'bun:test';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
@@ -37,7 +26,7 @@ ensureEnv('NODE_ENV', 'test');
 ensureEnv('API_PORT', '0');
 ensureEnv('LOG_LEVEL', 'silent');
 ensureEnv('CLERK_SECRET_KEY', 'test_clerk_secret');
-// svix expects `whsec_<base64>` (matches Clerk's real format) — a raw string
+// svix expects `whsec_<base64>` (matches Clerk's real format), a raw string
 // trips the standardwebhooks Base64Coder.
 ensureEnv('CLERK_WEBHOOK_SECRET', 'whsec_dGVzdF93ZWJob29rX3NlY3JldF9wYWRkaW5nISE=');
 ensureEnv('RESEND_API_KEY', 'test_resend_key');
@@ -84,7 +73,7 @@ export async function teardownTestDatabase() {
 
 export async function resetDb() {
   if (!pool) {
-    throw new Error('Test DB not set up — call setupTestDatabase first');
+    throw new Error('Test DB not set up, call setupTestDatabase first');
   }
   await pool.query(
     'TRUNCATE "users", "accounts", "memberships", "products", "notifications" RESTART IDENTITY CASCADE'
