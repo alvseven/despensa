@@ -23,7 +23,7 @@ mock.module('@clerk/backend', () => ({
   }
 }));
 
-process.env.NODE_ENV ??= 'development';
+process.env.NODE_ENV ??= 'test';
 process.env.API_PORT ??= '0';
 process.env.LOG_LEVEL ??= 'silent';
 process.env.CLERK_SECRET_KEY ??= 'test_clerk_secret';

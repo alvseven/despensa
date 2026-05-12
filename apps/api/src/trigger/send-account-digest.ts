@@ -1,12 +1,7 @@
 import { task } from '@trigger.dev/sdk/v3';
-import { z } from 'zod';
 
+import { sendExpirationDigestRequestSchema } from '@/modules/notifications/send-expiration-digest/schemas.ts';
 import { sendExpirationDigest } from '@/modules/notifications/send-expiration-digest/use-case.ts';
-
-const payloadSchema = z.object({
-  accountId: z.string(),
-  notificationIds: z.array(z.string()).min(1)
-});
 
 export const sendAccountDigestTask = task({
   id: 'send-account-digest',
@@ -17,7 +12,7 @@ export const sendAccountDigestTask = task({
     factor: 2
   },
   run: async (payload: unknown) => {
-    const parsed = payloadSchema.parse(payload);
-    return await sendExpirationDigest(parsed);
+    const input = sendExpirationDigestRequestSchema.parse(payload);
+    return await sendExpirationDigest(input);
   }
 });

@@ -1,8 +1,10 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { db } from '../index.ts';
+import type { Account } from '../schemas/accounts.ts';
 import type * as schema from '../schemas/index.ts';
+import { memberships } from '../schemas/memberships.ts';
 import { type User, users } from '../schemas/users.ts';
 
 type Tx = NodePgDatabase<typeof schema>;
@@ -43,11 +45,27 @@ export const usersRepository = (tx: Tx = db) => {
       .returning();
   };
 
+  const getOwnerForAccount = async (accountId: Account['id']) => {
+    const [owner] = await tx
+      .select({ id: users.id, name: users.name, email: users.email })
+      .from(users)
+      .innerJoin(memberships, eq(memberships.userId, users.id))
+      .where(
+        and(
+          eq(memberships.accountId, accountId),
+          eq(memberships.role, 'owner'),
+          isNull(users.deletedAt)
+        )
+      );
+    return owner;
+  };
+
   return {
     createUser,
     getUserById,
     getUserByClerkId,
     updateUserByClerkId,
-    softDeleteUserByClerkId
+    softDeleteUserByClerkId,
+    getOwnerForAccount
   };
 };

@@ -8,7 +8,7 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write --unsafe .",
     "test": "turbo test",
-    "types": "turbo types"
+    "types:check": "turbo types:check"
   },
   "devDependencies": {
     "@arthurfiorette/biomejs-config": "^1.0.7",

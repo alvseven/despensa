@@ -10,44 +10,44 @@ A food expiration tracker. Users (or accounts, in the B2B case) add pantry items
 
 ```
 apps/
-  api/   → backend (Hono + Drizzle + Postgres)  — api.despensa.com
-  app/   → product webapp (Next.js)             — app.despensa.com
-  www/   → marketing site (Next.js)             — despensa.com
+  api/   → backend (Hono + Drizzle + Postgres)  — api.despensa.ai
+  app/   → product webapp (Next.js)             — app.despensa.ai
+  www/   → marketing site (Next.js)             — despensa.ai
 infra/   → Pulumi (backend infra only)
 packages/ (empty for now — will hold shared TS code if needed)
 ```
 
 Frontends deploy via Vercel (config in `apps/<name>/vercel.json` when needed). Backend infra is managed by Pulumi in `/infra`.
 
-## Stack (current and pending)
+## Stack
 
-| Layer            | Choice                                | Status                     |
-| ---------------- | ------------------------------------- | -------------------------- |
-| Runtime / pkg    | Bun 1.1+                              | done                       |
-| Monorepo         | Bun workspaces + Turborepo            | done                       |
-| HTTP framework   | Hono                                  | done                       |
-| ORM              | Drizzle + node-postgres               | done                       |
-| Database         | Postgres 17                           | done (local docker)        |
-| Auth             | Clerk (passwordless: Google + email)  | done                       |
-| Webhooks         | svix (Clerk webhook signature verify) | done                       |
-| Validation       | Zod                                   | done                       |
-| Lint + format    | Biome                                 | done (single tool, no oxlint/prettier) |
-| Date handling    | date-fns + @date-fns/tz                | done (Temporal swap deferred) |
-| Background jobs  | Trigger.dev v3                         | done                       |
-| Notifications    | Email via Resend (digest)              | done                       |
-| Logs             | pino (pino-pretty in dev, JSON in prod) | done                      |
-| Errors           | Hono `app.onError` → pino + `Sentry.captureException` | done       |
-| Request tracing  | `x-request-id` middleware              | done                       |
-| Testing          | bun:test + testcontainers Postgres     | infra done (needs Docker)  |
-| Hosting (API)    | TBD (Fly.io / Railway / AWS App Runner) | **pending**              |
-| Hosting (DB)     | TBD (Neon recommended)                 | **pending**                |
-| IaC              | Pulumi (TypeScript)                    | scaffold only              |
+| Layer            | Choice                                                |
+| ---------------- | ----------------------------------------------------- |
+| Runtime / pkg    | Bun 1.1+                                              |
+| Monorepo         | Bun workspaces + Turborepo                            |
+| HTTP framework   | Hono                                                  |
+| ORM              | Drizzle + node-postgres                               |
+| Database         | Postgres 17                                           |
+| Auth             | Clerk (passwordless: Google + email)                  |
+| Webhooks         | svix (Clerk webhook signature verify)                 |
+| Validation       | Zod                                                   |
+| Lint + format    | Biome                                                 |
+| Date handling    | date-fns + @date-fns/tz                               |
+| Background jobs  | Trigger.dev v3                                        |
+| Notifications    | Email via Resend (digest)                             |
+| Logs             | pino (pino-pretty in dev, JSON in prod)               |
+| Errors           | Hono `app.onError` → pino + `Sentry.captureException` |
+| Request tracing  | `x-request-id` middleware                             |
+| Testing          | bun:test + testcontainers Postgres                    |
+| Hosting (API)    | TBD                                                   |
+| Hosting (DB)     | TBD                                                   |
+| IaC              | Pulumi (TypeScript)                                   |
 
 ## Backend code patterns
 
 ### Module layout
 
-Each resource is a module under `apps/api/src/modules/<resource>/`. Each *action* (endpoint) is a folder:
+Each resource is a module under `apps/api/src/modules/<resource>/`. Each *action* (endpoint or background handler) is a folder:
 
 ```
 modules/products/
@@ -55,15 +55,17 @@ modules/products/
   create-products/
     schemas.ts                       # Zod request schema + inferred type
     use-case.ts                      # Business logic, calls repos
+    use-case.test.ts                 # E2E tests for this action
   get-products/
     schemas.ts
     use-case.ts
+    use-case.test.ts
   ...
 ```
 
-`schemas.ts` exports a Zod schema named `<action>RequestSchema` and an inferred TypeScript type named `<Action>Input`.
+`schemas.ts` exports a Zod schema named `<action>RequestSchema` and an inferred TypeScript type named `<Action>Input`. Use cases take that inferred type, **never** an ad-hoc `type Input = { ... }`.
 
-`use-case.ts` exports an async function named `<action>` that takes the inferred input and returns either `[error, null]` or `[null, response]`.
+`use-case.ts` exports an async function named `<action>` that takes the inferred input and returns either `[error, null]` or `[null, response]` (the tuple convention below).
 
 ### The tuple-return convention
 
@@ -94,6 +96,10 @@ return c.json(response.data, response.code);
 
 Every error response carries the `requestId` so the client can correlate with logs.
 
+### Idempotent DELETE
+
+DELETE is always 204. Don't check whether the row exists first — `DELETE WHERE id = ? AND account_id = ?` is a no-op if it doesn't match. The repo handles ownership scoping; the route returns 204 unconditionally.
+
 ### Repositories
 
 `apps/api/src/shared/database/repositories/<resource>.ts` exports a factory that takes an optional transaction:
@@ -118,13 +124,28 @@ await db.transaction(async (tx) => {
 
 Repo functions never throw business errors — they return `undefined` for "not found" cases. Use cases convert that to `errorResponse(...)`. Unexpected DB errors propagate up.
 
+**Bulk operations**: prefer `createMany`, `markManyAs*` over for-loops. Drizzle's `insert(...).values(array)` and `inArray(column, ids)` are the right tools — never iterate one-by-one.
+
 ### Auth (Clerk)
 
 - The frontend obtains a Clerk session token. It sends `Authorization: Bearer <clerk-jwt>` on each request.
-- `requireAuth` middleware (`apps/api/src/modules/auth/middlewares/require-auth.ts`) verifies the token via `@clerk/backend`'s `verifyToken`, looks up our user by `clerk_id`, resolves their default account (first membership), and sets `c.set('auth', { clerkId, userId, accountId, email })`.
+- `requireAuth` middleware (`apps/api/src/modules/auth/middlewares/require-auth.ts`) verifies the token via `@clerk/backend`'s `verifyToken`, looks up our user by `clerk_id`, resolves their default account (first membership), and sets `c.set('auth', { clerkId, userId, accountId, email })`. The middleware also owns the `AuthContext` and `AppVariables` types — colocate types with the code that produces/consumes them; don't make a separate `types.ts`.
 - Protected routes read `c.get('auth').accountId` and scope queries by it. Never trust IDs from the request body for ownership — they must come from the verified `auth` context.
 - User provisioning happens via Clerk webhook at `POST /webhooks/clerk`. On `user.created`, we transactionally create our `users` row + a `personal` account + an `owner` membership. On `user.updated` we sync denormalized fields (name/email/avatar). On `user.deleted` we soft-delete.
 - Webhook signature verification uses `svix`. The `CLERK_WEBHOOK_SECRET` env var must match the secret in the Clerk dashboard webhook settings.
+
+### Webhooks module
+
+`apps/api/src/modules/webhooks/<provider>/` follows the same per-action layout as everything else:
+
+```
+webhooks/clerk/
+  routes.ts              # signature verify + dispatch
+  schemas.ts             # event Zod schemas + small helpers shared by handlers
+  user-created/use-case.ts
+  user-updated/use-case.ts
+  user-deleted/use-case.ts
+```
 
 ### Accounts / memberships model
 
@@ -138,6 +159,7 @@ Owner is set when the account is created. Admin/member roles are reserved for fu
 - Exports: camelCase functions, PascalCase types.
 - Use the `@/` path alias for imports from `apps/api/src/`.
 - Imports use `.ts` extensions (Bun resolves them; Drizzle migrations need them too).
+- **No type-only files.** Colocate types next to the code that owns them. A `*.types.ts` file is a smell.
 
 ## Adding a new endpoint
 
@@ -145,7 +167,7 @@ Owner is set when the account is created. Admin/member roles are reserved for fu
    - Export a Zod schema `<action>RequestSchema`
    - Export an inferred type `<Action>Input`
 2. Create `apps/api/src/modules/<resource>/<action>/use-case.ts`:
-   - Async function takes the input, returns the success/error tuple
+   - Function signature takes the inferred Zod type — never an ad-hoc inline type
    - Use `usersRepository()`, `productsRepository()`, etc.
    - For multi-step writes, wrap in `db.transaction`
 3. Wire it in `apps/api/src/modules/<resource>/routes.ts`:
@@ -153,6 +175,33 @@ Owner is set when the account is created. Admin/member roles are reserved for fu
    - Read `accountId` (or `userId`) from `c.get('auth')`
    - Call `validateSchema(...)` then the use case
    - Return `c.json(response.data, response.code)`
+4. Add a `use-case.test.ts` next to the use case.
+
+## Background jobs (Trigger.dev)
+
+Tasks live in `apps/api/src/trigger/`. Config in `apps/api/trigger.config.ts` (`dirs: ['./src/trigger']`).
+
+- **`process-pending-notifications`** — scheduled daily (`0 9 * * *`). Loads `status='created'` notifications whose `notify_at=today`, groups by account, triggers one `send-account-digest` child per account, marks each as `scheduled`.
+- **`send-account-digest`** — accepts `{ accountId, notificationIds[] }`, parses with the use case's Zod schema, delegates to `sendExpirationDigest`. Retries up to 3× with exponential backoff.
+
+Triggers are entry points (like HTTP routes are), not shared utilities — that's why they live at `src/trigger/`, not under `shared/`. They orchestrate; the actual business logic always lives in a `modules/<resource>/<action>/use-case.ts`.
+
+Local dev: `bun --filter @despensa/api trigger:dev` (needs `TRIGGER_PROJECT_REF` + `TRIGGER_ACCESS_TOKEN` from the Trigger.dev dashboard).
+
+Deploy: `bun --filter @despensa/api trigger:deploy`.
+
+## Testing
+
+Tests use `bun test` with `@testcontainers/postgresql`.
+
+- `apps/api/bunfig.toml` preloads `apps/api/src/shared/tests/setup.ts`.
+- `src/shared/tests/setup.ts` starts a container, sets env vars, runs Drizzle migrations, and mocks `@clerk/backend.verifyToken` so tests authenticate by sending `Authorization: Bearer test_<clerkId>`.
+- `src/shared/tests/factories.ts` exposes `createTestUser({ name?, email? })` which transactionally creates a user + personal account + owner membership and returns `{ user, account, token }`.
+- Tests live next to the code they cover: `use-case.test.ts` sits next to `use-case.ts`. Anything that can't be colocated (cross-cutting auth flow, etc.) goes under `src/shared/tests/`.
+- Each test file uses `beforeEach(() => resetDb())` to truncate all tables.
+- Tests hit the actual `app` via `app.request(path, init)` — no separate HTTP server needed.
+
+Run: `bun --filter @despensa/api test`. Requires Docker running locally.
 
 ## Database migrations
 
@@ -164,7 +213,7 @@ bun db:migrate                      # applies pending migrations
 bun db:studio                       # browse data
 ```
 
-Migrations live in `apps/api/drizzle/`. Each migration has a `.sql` file plus a `<timestamp>_snapshot.json` in `meta/`, all tracked in `meta/_journal.json`. When writing migrations by hand (e.g., adding a backfill), keep snapshots in sync — or run `bun db:generate` after the manual file and let it produce a no-op snapshot.
+Schema starts from `20260511000000_init.sql`. Pre-monorepo history was squashed since nothing was in production.
 
 ## Commands (root)
 
@@ -176,9 +225,9 @@ bun --filter @despensa/app dev   # webapp only
 bun --filter @despensa/www dev   # marketing only
 bun run lint                     # biome across the repo
 bun run lint:fix                 # biome --write --unsafe
+bun run types:check              # tsc --noEmit across workspaces
+bun run test                     # bun:test across workspaces (needs Docker)
 ```
-
-Per-app: `bun run build`, `bun run types`, `bun run db:generate`, `bun run db:migrate`.
 
 ## Pull request convention
 
@@ -216,44 +265,14 @@ Same spirit: short imperative subject (< 60 chars), optional body. Squash-merge 
 
 ## Decisions made (so they don't get re-litigated)
 
-- **Biome over oxlint + Prettier**: Biome does linting + formatting in one Rust binary. oxlint is linter-only; using it means re-adding Prettier. No net win.
-- **Email-first notifications**: Resend already in the stack, free up to 3k/month, plenty for dogfooding. SMS/WhatsApp deferred until paying customer demands it. Twilio is expensive; Brazilian providers like Z-API use unofficial APIs and can ban the number.
-- **Clerk over self-hosted auth**: Auth is solved; we're not in the auth business. Free up to 10k MAUs covers years of dogfooding.
-- **Pulumi for backend infra only**: Frontends deploy via Vercel (UI/config-only). Pulumi `/infra` is scaffolded; provider choices (AWS App Runner vs Fly vs Render) pending.
-- **Trigger.dev over keeping Lambdas**: Lambda + SQS + SNS + custom zip build was too much glue for one daily cron. Trigger.dev is one file per task with built-in retries and observability. Lambdas already deleted from the repo; replacement pending.
-- **Accounts + memberships model from day one**: Even while only B2C, products hang off `account_id`, not `user_id`. Lets us add B2B orgs later without a painful migration.
-
-## Background jobs (Trigger.dev)
-
-Tasks live in `apps/api/trigger/`. Config in `apps/api/trigger.config.ts`.
-
-- **`process-pending-notifications`** — scheduled daily (`0 9 * * *`). Loads `status='created'` notifications whose `notify_at=today`, groups by account, triggers one `send-account-digest` child per account, marks each as `scheduled`.
-- **`send-account-digest`** — accepts `{ accountId, notificationIds[] }`, fetches the account owner + products, builds a single HTML email via `sendExpirationDigest`, sends through Resend, marks notifications `sent` or `failed`. Retries up to 3× with exponential backoff.
-
-Local dev: `bun --filter @despensa/api trigger:dev` (needs `TRIGGER_PROJECT_REF` + `TRIGGER_ACCESS_TOKEN` from the Trigger.dev dashboard).
-
-Deploy: `bun --filter @despensa/api trigger:deploy`.
-
-## Testing
-
-Tests use `bun test` with `@testcontainers/postgresql` to spin up a real Postgres for each `bun test` invocation.
-
-- `apps/api/bunfig.toml` preloads `apps/api/test/setup.ts`.
-- `setup.ts` starts a container, sets env vars, runs Drizzle migrations, and mocks `@clerk/backend.verifyToken` so tests authenticate by sending `Authorization: Bearer test_<clerkId>`.
-- `test/factories.ts` exposes `createTestUser({ name?, email? })` which transactionally creates a user + personal account + owner membership and returns `{ user, account, token }`.
-- Each test file uses `beforeEach(() => resetDb())` to truncate all tables.
-- Tests hit the actual `app` via `app.request(path, init)` — no separate HTTP server needed (Hono's `app.request` is the standard pattern).
-
-Run: `bun --filter @despensa/api test`. Requires Docker running locally.
-
-## Pending
-
-1. **Hosting decisions** — pick API host (Fly.io vs Railway vs AWS App Runner) + DB host (Neon strongly recommended). Once chosen, wire up `/infra` Pulumi resources.
-2. **Temporal API** — replace date-fns. Deferred indefinitely; no urgency since current date handling works.
+- **Biome**: linting + formatting in one Rust binary. Replaces ESLint + Prettier or oxlint + Prettier.
+- **Email-first notifications**: Resend, free tier covers dogfooding. SMS/WhatsApp deferred until a paying customer demands it.
+- **Clerk over self-hosted auth**: auth is solved; we're not in the auth business.
+- **Pulumi for backend infra only**: frontends deploy via Vercel.
+- **Trigger.dev over Lambdas**: one file per task with built-in retries, scheduling, observability.
+- **Accounts + memberships from day one**: even while B2C, resources hang off `account_id`, not `user_id`.
 
 ## Known gotchas
 
 - Bun loads `.env` automatically for both scripts and child processes (drizzle-kit, etc). No `dotenv` import needed.
-- Hono's `verify` from `hono/jwt` requires the algorithm as a third argument now — but we don't use it anymore (Clerk handles JWT verification).
 - The `users` table is **denormalized** with Clerk-managed fields (email, name, avatarUrl). They're kept in sync via the `user.updated` webhook. Treat Clerk as the source of truth; our DB is the lookup index.
-- Schema starts from a single init migration (`20260511000000_init.sql`). Pre-monorepo migration history was squashed since nothing was in production yet — `bun --filter @despensa/api db:migrate` against a fresh database creates the whole schema in one shot.

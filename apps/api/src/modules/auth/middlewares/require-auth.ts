@@ -5,7 +5,25 @@ import { envs } from '@/shared/config/env.ts';
 import { membershipsRepository } from '@/shared/database/repositories/memberships.ts';
 import { usersRepository } from '@/shared/database/repositories/users.ts';
 import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
-import type { AppVariables } from '../jwt-payload.ts';
+
+/**
+ * Attached to the Hono context by `requireAuth` after a Clerk session token
+ * is verified and the caller's default account is resolved.
+ *
+ * `clerkId` comes from the Clerk JWT `sub` claim; `userId` and `accountId`
+ * come from our DB lookup keyed on `clerkId`.
+ */
+export type AuthContext = {
+  clerkId: string;
+  userId: string;
+  accountId: string;
+  email: string;
+};
+
+export type AppVariables = {
+  auth: AuthContext;
+  requestId: string;
+};
 
 export const requireAuth = createMiddleware<{ Variables: AppVariables }>(async (c, next) => {
   const authHeader = c.req.header('Authorization');

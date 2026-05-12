@@ -6,9 +6,9 @@ Track your pantry. Get notified before things expire.
 
 ```
 apps/
-  api/   -> backend (Hono + Drizzle + Postgres) — api.despensa.com
-  app/   -> product webapp (Next.js)            — app.despensa.com
-  www/   -> marketing site (Next.js)            — despensa.com
+  api/   -> backend (Hono + Drizzle + Postgres) — api.despensa.ai
+  app/   -> product webapp (Next.js)            — app.despensa.ai
+  www/   -> marketing site (Next.js)            — despensa.ai
 packages/
   (shared code — empty for now)
 ```

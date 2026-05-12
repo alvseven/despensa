@@ -10,14 +10,14 @@ import { globalErrorHandler } from './infra/http/error-handler.ts';
 import { requestId } from './infra/http/middlewares/request-id.ts';
 import { logger } from './infra/observability/logger.ts';
 
-import type { AppVariables } from '../modules/auth/jwt-payload.ts';
+import type { AppVariables } from '../modules/auth/middlewares/require-auth.ts';
 import { productsRoutes } from '../modules/products/routes.ts';
 import { usersRoutes } from '../modules/users/routes.ts';
 import { clerkWebhooksRoutes } from '../modules/webhooks/clerk/routes.ts';
 
 const allowedOrigins =
   envs.NODE_ENV === 'production'
-    ? ['https://app.despensa.com', 'https://despensa.com']
+    ? ['https://app.despensa.ai', 'https://despensa.ai']
     : ['http://localhost:3000', 'http://localhost:3001'];
 
 export const app = new Hono<{ Variables: AppVariables }>();

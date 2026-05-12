@@ -1,5 +1,5 @@
 name: despensa-infra
-description: Infrastructure for the Despensa backend (api.despensa.com)
+description: Infrastructure for the Despensa backend (api.despensa.ai)
 runtime:
   name: nodejs
   options:

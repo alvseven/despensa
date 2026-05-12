@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
 
 import { app } from '@/shared/app.ts';
-import { createTestUser } from './factories.ts';
-import { resetDb } from './setup.ts';
+import { createTestUser } from '@/shared/tests/factories.ts';
+import { resetDb } from '@/shared/tests/setup.ts';
 
 beforeEach(async () => {
   await resetDb();

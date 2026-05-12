@@ -12,5 +12,5 @@
     "jsxImportSource": "hono/jsx",
     "lib": ["ESNext"]
   },
-  "include": ["src/**/*", "drizzle.config.ts", "trigger.config.ts", "trigger/**/*"]
+  "include": ["src/**/*", "drizzle.config.ts", "trigger.config.ts"]
 }

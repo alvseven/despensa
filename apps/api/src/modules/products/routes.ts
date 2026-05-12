@@ -11,8 +11,7 @@ import { getProducts } from './get-products/use-case.ts';
 import { updateProductByIdRequestSchema } from './update-product/schemas.ts';
 import { updateProductById } from './update-product/use-case.ts';
 
-import type { AppVariables } from '../auth/jwt-payload.ts';
-import { requireAuth } from '../auth/middlewares/require-auth.ts';
+import { type AppVariables, requireAuth } from '../auth/middlewares/require-auth.ts';
 
 import { validateSchema } from '@/shared/helpers/validate-schema.ts';
 
@@ -112,11 +111,6 @@ productsRoutes.delete('/:id', async (c) => {
     return c.json({ message: schemaError.message }, schemaError.code);
   }
 
-  const [error] = await deleteProduct(parsedSchema.data);
-
-  if (error) {
-    return c.json({ message: error.message }, error.code);
-  }
-
-  return c.status(204);
+  await deleteProduct(parsedSchema.data);
+  return c.body(null, 204);
 });

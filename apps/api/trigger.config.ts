@@ -5,7 +5,7 @@ export default defineConfig({
   runtime: 'bun',
   logLevel: 'log',
   maxDuration: 300,
-  dirs: ['./trigger'],
+  dirs: ['./src/trigger'],
   build: {
     external: ['pg', 'drizzle-orm']
   }
