@@ -46,11 +46,10 @@ app.use(async (c, next) => {
   );
 });
 
-// Liveness — process is up. Use this for restart logic.
+// Liveness, process is up. Use this for restart logic.
 app.get('/health', (c) => c.json({ status: 'ok' }));
 
-// Readiness — process can serve traffic (DB reachable). Use this for LB
-// readiness probes / blue-green cutovers.
+// Readiness, process can serve traffic (DB reachable), Use this for LB.
 app.get('/ready', async (c) => {
   try {
     await db.execute(sql`SELECT 1`);
