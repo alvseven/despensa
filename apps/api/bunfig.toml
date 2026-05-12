@@ -1,0 +1,3 @@
+[test]
+preload = ["./src/shared/tests/setup.ts"]
+timeout = 30000
