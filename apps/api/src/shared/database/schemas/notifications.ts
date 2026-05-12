@@ -1,5 +1,5 @@
 import { type InferSelectModel, relations } from 'drizzle-orm';
-import { pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { date, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 import { randomUUID } from 'node:crypto';
 
@@ -21,7 +21,7 @@ export const notifications = pgTable('notifications', {
   productId: text('product_id')
     .notNull()
     .references(() => products.id, { onDelete: 'cascade' }),
-  notifyAt: timestamp('notify_at', { withTimezone: true, mode: 'string' }).notNull(),
+  notifyAt: date('notify_at', { mode: 'string' }).notNull(),
   status: notificationStatusEnum('status').notNull().default('created'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()

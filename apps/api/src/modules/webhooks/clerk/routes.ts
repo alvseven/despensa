@@ -12,7 +12,7 @@ import { handleUserUpdated } from './user-updated/use-case.ts';
 
 export const clerkWebhooksRoutes = new Hono();
 
-clerkWebhooksRoutes.post('/', async (c) => {
+clerkWebhooksRoutes.post('', async (c) => {
   const svixId = c.req.header('svix-id');
   const svixTimestamp = c.req.header('svix-timestamp');
   const svixSignature = c.req.header('svix-signature');
@@ -37,6 +37,13 @@ clerkWebhooksRoutes.post('/', async (c) => {
 
   const event = clerkEventSchema.safeParse(verified);
   if (!event.success) {
+    logger.warn(
+      {
+        type: (verified as { type?: string } | null)?.type,
+        fieldErrors: event.error.flatten().fieldErrors
+      },
+      'clerk webhook payload not in expected shape — ignoring'
+    );
     return c.body(null, STATUS_CODES.NO_CONTENT);
   }
 

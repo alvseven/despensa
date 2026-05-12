@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { db } from '../index.ts';
@@ -15,9 +14,5 @@ export const membershipsRepository = (tx: Tx = db) => {
     return created;
   };
 
-  const getMembershipsByUserId = async (userId: Membership['userId']) => {
-    return await tx.select().from(memberships).where(eq(memberships.userId, userId));
-  };
-
-  return { createMembership, getMembershipsByUserId };
+  return { createMembership };
 };

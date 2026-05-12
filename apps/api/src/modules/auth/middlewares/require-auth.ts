@@ -2,16 +2,13 @@ import { verifyToken } from '@clerk/backend';
 import { createMiddleware } from 'hono/factory';
 
 import { envs } from '@/shared/config/env.ts';
-import { membershipsRepository } from '@/shared/database/repositories/memberships.ts';
 import { usersRepository } from '@/shared/database/repositories/users.ts';
 import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
+import { logger } from '@/shared/infra/observability/logger.ts';
 
 /**
  * Attached to the Hono context by `requireAuth` after a Clerk session token
  * is verified and the caller's default account is resolved.
- *
- * `clerkId` comes from the Clerk JWT `sub` claim; `userId` and `accountId`
- * come from our DB lookup keyed on `clerkId`.
  */
 export type AuthContext = {
   clerkId: string;
@@ -34,34 +31,28 @@ export const requireAuth = createMiddleware<{ Variables: AppVariables }>(async (
 
   const token = authHeader.slice('Bearer '.length);
 
+  let clerkId: string;
   try {
     const payload = await verifyToken(token, { secretKey: envs.CLERK_SECRET_KEY });
-
-    const clerkId = payload.sub;
-
-    const user = await usersRepository().getUserByClerkId(clerkId);
-
-    if (!user) {
-      return c.json({ message: 'User not provisioned' }, STATUS_CODES.UNAUTHORIZED);
-    }
-
-    const memberships = await membershipsRepository().getMembershipsByUserId(user.id);
-    const defaultMembership = memberships[0];
-
-    if (!defaultMembership) {
-      return c.json({ message: 'No account for user' }, STATUS_CODES.FORBIDDEN);
-    }
-
-    c.set('auth', {
-      clerkId,
-      userId: user.id,
-      accountId: defaultMembership.accountId,
-      email: user.email
-    });
-
-    await next();
-  } catch (error) {
-    console.error('Clerk token verification failed:', error);
+    clerkId = payload.sub;
+  } catch (err) {
+    logger.warn({ err, requestId: c.get('requestId') }, 'clerk token verification failed');
     return c.json({ message: 'Invalid token' }, STATUS_CODES.UNAUTHORIZED);
   }
+
+  // DB errors below propagate to globalErrorHandler — they're not 401s.
+  const authContext = await usersRepository().getAuthContextByClerkId(clerkId);
+
+  if (!authContext) {
+    return c.json({ message: 'User not provisioned or has no account' }, STATUS_CODES.UNAUTHORIZED);
+  }
+
+  c.set('auth', {
+    clerkId,
+    userId: authContext.userId,
+    accountId: authContext.accountId,
+    email: authContext.email
+  });
+
+  await next();
 });

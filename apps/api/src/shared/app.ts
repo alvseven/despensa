@@ -1,11 +1,13 @@
 // IMPORTANT: import sentry first so init runs before anything else.
 import './infra/observability/sentry.ts';
 
+import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { prettyJSON } from 'hono/pretty-json';
 
 import { envs } from './config/env.ts';
+import { db } from './database/index.ts';
 import { globalErrorHandler } from './infra/http/error-handler.ts';
 import { requestId } from './infra/http/middlewares/request-id.ts';
 import { logger } from './infra/observability/logger.ts';
@@ -15,16 +17,11 @@ import { productsRoutes } from '../modules/products/routes.ts';
 import { usersRoutes } from '../modules/users/routes.ts';
 import { clerkWebhooksRoutes } from '../modules/webhooks/clerk/routes.ts';
 
-const allowedOrigins =
-  envs.NODE_ENV === 'production'
-    ? ['https://app.despensa.ai', 'https://despensa.ai']
-    : ['http://localhost:3000', 'http://localhost:3001'];
-
 export const app = new Hono<{ Variables: AppVariables }>();
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: envs.CORS_ALLOWED_ORIGINS,
     allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Authorization', 'Content-Type', 'x-request-id'],
     exposeHeaders: ['x-request-id'],
@@ -49,7 +46,20 @@ app.use(async (c, next) => {
   );
 });
 
+// Liveness — process is up. Use this for restart logic.
 app.get('/health', (c) => c.json({ status: 'ok' }));
+
+// Readiness — process can serve traffic (DB reachable). Use this for LB
+// readiness probes / blue-green cutovers.
+app.get('/ready', async (c) => {
+  try {
+    await db.execute(sql`SELECT 1`);
+    return c.json({ status: 'ok' });
+  } catch (err) {
+    logger.warn({ err }, 'readiness check failed');
+    return c.json({ status: 'unavailable' }, 503);
+  }
+});
 
 const v1 = new Hono<{ Variables: AppVariables }>();
 v1.route('/users', usersRoutes);

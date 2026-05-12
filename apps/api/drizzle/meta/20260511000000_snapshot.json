@@ -305,7 +305,7 @@
         },
         "notify_at": {
           "name": "notify_at",
-          "type": "timestamp with time zone",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
 
 import { app } from '@/shared/app.ts';
-import { createTestUser } from '@/shared/tests/factories.ts';
+import { createTestUser, dateOffset } from '@/shared/tests/factories.ts';
 import { resetDb } from '@/shared/tests/setup.ts';
 
 beforeEach(async () => {
@@ -20,10 +20,10 @@ describe('POST /v1/products', () => {
       },
       body: JSON.stringify({
         name: 'Apple',
-        buyedAt: '2026-05-10',
-        expiresAt: '2026-05-20',
+        buyedAt: dateOffset(-2),
+        expiresAt: dateOffset(8),
         category: 'fruit',
-        notifications: ['2026-05-18']
+        notifications: [dateOffset(6)]
       })
     });
 
@@ -50,9 +50,51 @@ describe('POST /v1/products', () => {
       body: JSON.stringify({
         name: 'Apple',
         buyedAt: 'not-a-date',
-        expiresAt: '2026-05-20',
+        expiresAt: dateOffset(8),
         category: 'fruit',
-        notifications: ['2026-05-18']
+        notifications: [dateOffset(6)]
+      })
+    });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('rejects malformed notification dates', async () => {
+    const { token } = await createTestUser();
+
+    const res = await app.request('/v1/products', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: 'Apple',
+        buyedAt: dateOffset(-2),
+        expiresAt: dateOffset(8),
+        category: 'fruit',
+        notifications: ['banana']
+      })
+    });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('rejects past notification dates', async () => {
+    const { token } = await createTestUser();
+
+    const res = await app.request('/v1/products', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: 'Apple',
+        buyedAt: dateOffset(-2),
+        expiresAt: dateOffset(8),
+        category: 'fruit',
+        notifications: [dateOffset(-1)]
       })
     });
 

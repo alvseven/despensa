@@ -48,7 +48,7 @@ CREATE TABLE "notifications" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
 	"product_id" text NOT NULL,
-	"notify_at" timestamp with time zone NOT NULL,
+	"notify_at" date NOT NULL,
 	"status" "notification_status" DEFAULT 'created' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now()

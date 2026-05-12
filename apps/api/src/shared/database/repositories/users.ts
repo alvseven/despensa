@@ -1,4 +1,4 @@
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, asc, eq, isNull } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { db } from '../index.ts';
@@ -51,6 +51,29 @@ export const usersRepository = (tx: Tx = db) => {
       .returning();
   };
 
+  /**
+   * Resolve a Clerk-authenticated user + their default account in one query.
+   *
+   * "Default account" today is the oldest membership the user has — every user
+   * has exactly one (the personal account auto-created on signup). When B2B
+   * lands and users start belonging to multiple accounts, replace this with
+   * an explicit `users.default_account_id` column.
+   */
+  const getAuthContextByClerkId = async (clerkId: User['clerkId']) => {
+    const [row] = await tx
+      .select({
+        userId: users.id,
+        email: users.email,
+        accountId: memberships.accountId
+      })
+      .from(users)
+      .innerJoin(memberships, eq(memberships.userId, users.id))
+      .where(and(eq(users.clerkId, clerkId), isNull(users.deletedAt)))
+      .orderBy(asc(memberships.createdAt))
+      .limit(1);
+    return row;
+  };
+
   const getOwnerForAccount = async (accountId: Account['id']) => {
     const [owner] = await tx
       .select({ id: users.id, name: users.name, email: users.email })
@@ -70,6 +93,7 @@ export const usersRepository = (tx: Tx = db) => {
     createUser,
     getUserById,
     getUserByClerkId,
+    getAuthContextByClerkId,
     updateUserByClerkId,
     softDeleteUserByClerkId,
     getOwnerForAccount

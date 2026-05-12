@@ -5,18 +5,11 @@ import { errorResponse, successResponse } from '@/shared/infra/http/api-response
 import { STATUS_CODES } from '@/shared/infra/http/status-code.ts';
 
 export async function updateProductById(product: UpdateProductByIdInput) {
-  const { getProductByIdAndAccountId, updateProductById } = productsRepository();
+  const updated = await productsRepository().updateProductById(product);
 
-  const productFound = await getProductByIdAndAccountId({
-    id: product.id,
-    accountId: product.accountId
-  });
-
-  if (!productFound) {
+  if (!updated) {
     return errorResponse('Product not found', STATUS_CODES.NOT_FOUND);
   }
 
-  const updatedProduct = await updateProductById(product);
-
-  return successResponse(updatedProduct, STATUS_CODES.OK);
+  return successResponse(updated, STATUS_CODES.OK);
 }

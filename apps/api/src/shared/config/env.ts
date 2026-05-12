@@ -13,7 +13,17 @@ const envsSchema = z.object({
   CLERK_SECRET_KEY: z.string(),
   CLERK_WEBHOOK_SECRET: z.string(),
 
-  RESEND_API_KEY: z.string()
+  RESEND_API_KEY: z.string(),
+
+  CORS_ALLOWED_ORIGINS: z
+    .string()
+    .default('http://localhost:3000,http://localhost:3001')
+    .transform((s) =>
+      s
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+    )
 });
 
 export const envs = Object.freeze(envsSchema.parse(process.env));

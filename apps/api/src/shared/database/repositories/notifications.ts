@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { and, eq, inArray } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
@@ -15,12 +14,11 @@ export const notificationsRepository = (tx: Tx = db) => {
     return await tx.insert(notifications).values(rows).returning();
   };
 
-  const getPendingForToday = async () => {
-    const today = format(new Date(), 'yyyy-MM-dd');
+  const getPendingFor = async (date: string) => {
     return await tx
       .select()
       .from(notifications)
-      .where(and(eq(notifications.status, 'created'), eq(notifications.notifyAt, today)));
+      .where(and(eq(notifications.status, 'created'), eq(notifications.notifyAt, date)));
   };
 
   const getWithProductsForAccount = async (
@@ -40,7 +38,7 @@ export const notificationsRepository = (tx: Tx = db) => {
 
   return {
     createMany,
-    getPendingForToday,
+    getPendingFor,
     getWithProductsForAccount,
     markManyAsScheduled: (ids: Notification['id'][]) => markManyAs('scheduled', ids),
     markManyAsSent: (ids: Notification['id'][]) => markManyAs('sent', ids),
