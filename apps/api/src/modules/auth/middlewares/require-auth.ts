@@ -40,7 +40,6 @@ export const requireAuth = createMiddleware<{ Variables: AppVariables }>(async (
     return c.json({ message: 'Invalid token' }, STATUS_CODES.UNAUTHORIZED);
   }
 
-  // DB errors below propagate to globalErrorHandler — they're not 401s.
   const authContext = await usersRepository().getAuthContextByClerkId(clerkId);
 
   if (!authContext) {
