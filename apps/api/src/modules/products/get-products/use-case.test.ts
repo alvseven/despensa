@@ -37,7 +37,7 @@ describe('GET /v1/products', () => {
       })
     });
 
-    const res = await app.request('/products/', {
+    const res = await app.request('/v1/products/', {
       headers: { Authorization: `Bearer ${alice.token}` }
     });
     expect(res.status).toBe(200);
