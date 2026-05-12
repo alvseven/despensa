@@ -8,7 +8,7 @@
  * Each test file gets a clean DB via the `resetDb()` helper exported here.
  */
 
-import { mock } from 'bun:test';
+import { afterAll, mock } from 'bun:test';
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
@@ -30,6 +30,13 @@ process.env.LOG_LEVEL ??= 'silent';
 process.env.CLERK_SECRET_KEY ??= 'test_clerk_secret';
 process.env.CLERK_WEBHOOK_SECRET ??= 'test_webhook_secret';
 process.env.RESEND_API_KEY ??= 'test_resend_key';
+
+// Ryuk (testcontainers' cleanup sidecar) waits for a /.*Started.*/ log
+// message that podman's log streaming truncates before, and that ephemeral
+// CI runners can't reattach to anyway. Disabling it lets the actual postgres
+// container start. Leaked containers aren't a real concern here — each test
+// run is its own process and uses fresh resources.
+process.env.TESTCONTAINERS_RYUK_DISABLED ??= 'true';
 
 let container: StartedPostgreSqlContainer | null = null;
 let pool: Pool | null = null;
@@ -74,3 +81,7 @@ try {
   console.error('test database setup failed:', err);
   process.exit(1);
 }
+
+afterAll(async () => {
+  await teardownTestDatabase();
+});
