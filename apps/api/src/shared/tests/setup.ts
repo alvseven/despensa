@@ -26,12 +26,19 @@ mock.module('@clerk/backend', () => ({
   }
 }));
 
-process.env.NODE_ENV ??= 'test';
-process.env.API_PORT ??= '0';
-process.env.LOG_LEVEL ??= 'silent';
-process.env.CLERK_SECRET_KEY ??= 'test_clerk_secret';
-process.env.CLERK_WEBHOOK_SECRET ??= 'test_webhook_secret';
-process.env.RESEND_API_KEY ??= 'test_resend_key';
+// Bun auto-loads apps/api/.env, which (when copied from .env.example) sets
+// secret vars to empty strings. `??=` only fires on undefined, so those empty
+// strings would slip through — use a helper that treats empty as missing.
+const ensureEnv = (key: string, fallback: string) => {
+  if (!process.env[key]) process.env[key] = fallback;
+};
+
+ensureEnv('NODE_ENV', 'test');
+ensureEnv('API_PORT', '0');
+ensureEnv('LOG_LEVEL', 'silent');
+ensureEnv('CLERK_SECRET_KEY', 'test_clerk_secret');
+ensureEnv('CLERK_WEBHOOK_SECRET', 'test_webhook_secret');
+ensureEnv('RESEND_API_KEY', 'test_resend_key');
 process.env.DATABASE_URL = TEST_DATABASE_URL;
 process.env.DRIZZLE_KIT_DATABASE_URL = TEST_DATABASE_URL;
 

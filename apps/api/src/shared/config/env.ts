@@ -7,13 +7,13 @@ const envsSchema = z.object({
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   SENTRY_DSN: z.string().optional(),
 
-  DATABASE_URL: z.string(),
-  DRIZZLE_KIT_DATABASE_URL: z.string(),
+  DATABASE_URL: z.string().min(1),
+  DRIZZLE_KIT_DATABASE_URL: z.string().min(1),
 
-  CLERK_SECRET_KEY: z.string(),
-  CLERK_WEBHOOK_SECRET: z.string(),
+  CLERK_SECRET_KEY: z.string().min(1),
+  CLERK_WEBHOOK_SECRET: z.string().min(1),
 
-  RESEND_API_KEY: z.string(),
+  RESEND_API_KEY: z.string().min(1),
 
   CORS_ALLOWED_ORIGINS: z
     .string()
