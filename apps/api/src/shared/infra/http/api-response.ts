@@ -54,7 +54,7 @@ export const respond = <T extends Record<string, unknown> | boolean | unknown[]>
   result: UseCaseResult<T>
 ) => {
   const [error, response] = result;
-  
+
   if (error) return c.json({ message: error.message }, error.code);
 
   return c.json(response.data, response.code as ContentfulStatusCode);
