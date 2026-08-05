@@ -31,6 +31,8 @@ Frontends deploy via Vercel (config in `apps/<name>/vercel.json` when needed). B
 | Auth             | Clerk (passwordless: Google + email)                  |
 | Webhooks         | svix (Clerk webhook signature verify)                 |
 | Validation       | Zod                                                   |
+| Frontend         | Next.js 15 App Router (React 19, server components)   |
+| Styling          | Tailwind v4 (CSS-first) + shadcn/ui (new-york, zinc)  |
 | Lint + format    | Biome                                                 |
 | Date handling    | date-fns + @date-fns/tz                               |
 | Background jobs  | Trigger.dev v3                                        |
@@ -189,6 +191,32 @@ Triggers are entry points (like HTTP routes are), not shared utilities — that'
 Local dev: `bun --filter @despensa/api trigger:dev` (needs `TRIGGER_PROJECT_REF` + `TRIGGER_ACCESS_TOKEN` from the Trigger.dev dashboard).
 
 Deploy: `bun --filter @despensa/api trigger:deploy`.
+
+## Frontend code patterns (apps/app)
+
+### Styling
+
+Tailwind v4 (CSS-first — no `tailwind.config.js`) + shadcn/ui in the `new-york` style, `zinc` base. Design tokens live in `src/app/globals.css`: shadcn's standard set plus an `--expiry-{critical,soon,ok}` urgency scale that both the list accents and any future badges read from. `components.json` is present so `bunx shadcn@latest add <component>` drops new primitives into `src/components/ui/` correctly.
+
+The primitives in `src/components/ui/` are dependency-free hand-placed equivalents of shadcn's output (no Radix yet — nothing has needed a portal or focus trap). Replace them with the real `shadcn add` version the moment one does.
+
+### The server/client boundary
+
+This is the easiest thing to get wrong here, and `tsc` will not catch it — only `next build` does.
+
+- `src/lib/api-client.ts` and `src/lib/env.ts` import `server-only`. They reach for Clerk's `auth()`, which needs request context.
+- Anything that talks to the API is split in two: `src/lib/<resource>/api.ts` (server-only fetchers) and `src/lib/<resource>/schemas.ts` (types, Zod schemas, pure helpers — safe to import from client components).
+- A client component importing from `api.ts` fails the build with `'server-only' cannot be imported from a Client Component`. That's the guardrail working. Import from `schemas.ts` instead.
+
+### Data flow
+
+Server components fetch (`await getProducts()`); mutations go through server actions in `<route>/actions.ts` that validate with the shared Zod schema, call the API, then `revalidatePath`. Forms are client components using React 19's `useActionState`, so the action's returned state carries both `message` and `fieldErrors` back to the fields.
+
+Never send `accountId` from the client — the API resolves it from the verified Clerk token. The client-side Zod schemas mirror the API's for fast feedback, but the API stays authoritative (it validates dates against São Paulo's "today", which can differ from the browser's by hours).
+
+### Notification lead times
+
+The API stores absolute `notify_at` dates; the UI collects *lead times* (7/3/1 days before expiry) and converts them in `resolveNotificationDates`. Lead times landing in the past are dropped, falling back to the expiry date itself so the 1-to-3-notification constraint always holds.
 
 ## Testing
 
