@@ -22,11 +22,24 @@ packages/
 
 ```bash
 bun install
-cp apps/api/.env.example apps/api/.env   # then fill in values
-docker compose up -d database              # local Postgres
+
+cp apps/api/.env.example apps/api/.env         # then fill in values
+cp apps/app/.env.example apps/app/.env.local   # then fill in values
+
+docker compose -f apps/api/compose.yaml up -d database   # local Postgres
 bun --filter @despensa/api db:migrate
-bun dev                                    # runs all apps via turborepo
+
+bun dev   # runs all apps via turborepo
 ```
+
+Both `.env` files must point at the **same** Clerk instance — the webapp mints
+session tokens the API has to be able to verify.
+
+For the webapp to see your user, Clerk's `user.created` webhook has to reach the
+API, which provisions the `users` row + personal account. Locally that means
+exposing `http://localhost:3333/webhooks/clerk` (Clerk's dashboard can tunnel, or
+use ngrok) and setting `CLERK_WEBHOOK_SECRET` to match. Without it, every
+authenticated request 401s with `User not provisioned or has no account`.
 
 ## Per-app dev
 
